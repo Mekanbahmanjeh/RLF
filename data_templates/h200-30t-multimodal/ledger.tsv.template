@@ -1,0 +1,8 @@
+# Replace every placeholder. Shards should be immutable, independently hashed,
+# and small enough to checkpoint transactionally. The 15T/30T campaign target
+# is measured in cumulative Solstice tokenizer pieces, not estimated records.
+shard_id	kind	split	modality	language	domain	format	path	source_uri	license	created_utc	sha256	preprocessing_version	teacher	evaluation_family	approved
+text-en-000001	text	train	text	en	general	text_lines	shards/text-en-000001.txt	<source-uri>	<license>	2026-07-24	<sha256>	h200-v1	none	none	false
+instructions-000001	instruction	train	text	en	instruction	tsv	shards/instructions-000001.tsv	<source-uri>	<license>	2026-07-24	<sha256>	h200-v1	<teacher-or-none>	none	false
+vision-000001	vision	train	image-text	multi	vision	vision_tsv	shards/vision-000001.tsv	<source-uri>	<license>	2026-07-24	<sha256>	h200-v1	<teacher-or-none>	none	false
+heldout-000001	dialogue	evaluation	text	en	general	tsv	shards/heldout-000001.tsv	<source-uri>	<license>	2026-07-24	<sha256>	h200-v1	none	private_frontier_holdout	false

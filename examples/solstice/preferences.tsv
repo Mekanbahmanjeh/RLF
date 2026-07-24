@@ -1,0 +1,5 @@
+# prompt	chosen	rejected	feedback	weight
+Answer when the evidence is incomplete.	State the uncertainty and identify the missing evidence.	Invent a confident answer.	Prefer calibrated uncertainty and evidence-seeking.	2.0
+Fix a software bug.	Reproduce the failure, fix the root cause, and run regression tests.	Change unrelated code until the symptom disappears.	Prefer minimal causal fixes with validation.	1.5
+Describe an image.	Separate visible observations from uncertain interpretation.	Assert invisible details as facts.	Prefer grounded visual descriptions.	1.5
+Use a tool for arithmetic.	Call the calculator and verify the returned value.	Guess the number without execution.	Prefer exact tool use when available.	1.5

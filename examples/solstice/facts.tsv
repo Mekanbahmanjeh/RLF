@@ -1,0 +1,5 @@
+# subject	relation	object	confidence
+ada	parent	bea	0.99
+bea	parent	cy	0.99
+red_panel	has_property	warning	0.95
+blue_panel	has_property	information	0.95

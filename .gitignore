@@ -1,0 +1,44 @@
+# ── Build output ──────────────────────────────────────────────
+/build/
+/build-*/
+/build-matrix/
+/rlf-builds/
+out/
+CMakeUserPresets.json
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+CTestTestfile.cmake
+compile_commands.json
+.ninja_deps
+.ninja_log
+
+# ── Run artifacts / evidence output ──────────────────────────
+/results/*
+!/results/.gitkeep
+/benchmarks/efficiency_campaign/generated/
+/benchmarks/efficiency_campaign/evaluation_v1/
+/datasets/external/
+/SOURCE_MANIFEST_SHA256.txt
+/CODEX_GOAL.txt
+# Training-run checkpoints (keep curated models/ instead).
+*.rlf
+
+# ── OS / editor noise ─────────────────────────────────────────
+*.Zone.Identifier
+Thumbs.db
+Desktop.ini
+.DS_Store
+*~
+*.swp
+*.swo
+.vs/
+.vscode/
+.idea/
+
+# ── Misc ──────────────────────────────────────────────────────
+*.log
+*.tmp
+*.bak
+/core
+/core.*

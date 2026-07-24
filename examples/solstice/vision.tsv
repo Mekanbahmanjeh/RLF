@@ -1,0 +1,5 @@
+# image_path<TAB>caption
+vision/red_panel.ppm	a red warning panel
+vision/blue_panel.ppm	a blue information panel
+vision/green_left.ppm	a green rectangle on the left side
+vision/green_right.ppm	a green rectangle on the right side

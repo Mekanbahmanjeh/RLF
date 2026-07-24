@@ -1,0 +1,3 @@
+# sequence_id<TAB>frame_index<TAB>fps<TAB>frame_path<TAB>frame_sha256<TAB>prompt<TAB>frame_caption
+clip-000001	0	24	../media/frames/clip-000001/000000.ppm	<sha256-of-frame>	<a single-line video prompt>	<a single-line description of this frame and motion state>
+clip-000001	1	24	../media/frames/clip-000001/000001.ppm	<sha256-of-frame>	<a single-line video prompt>	<a single-line description of the next frame and motion state>

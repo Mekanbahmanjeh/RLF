@@ -1,0 +1,9 @@
+# request<TAB>tool_name
+calculate 144 / 12	calculator
+compute (20 + 5) * 4	calculator
+tell me the current local time	current_time
+what is today's date	current_time
+read file README.md	read_text_file
+show the contents of file configs/frontier_release.conf	read_text_file
+list files in directory docs	list_directory
+show files in folder examples	list_directory

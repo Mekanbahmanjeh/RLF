@@ -1,0 +1,2 @@
+# Exactly 1,000 frozen rows. The ninth field is comma-separated evaluation tags.
+evaluation-0000001	@neutral-gray128-target-size-v1	cac3ac3dabb4ef531f7c4239cbbc8688bbc325e5e8dd2319047af919ba944360	images/evaluation-0000001.png	<target-sha256>	please add a red circle and then place a blue square above it	https://source.example/item/4001	CC-BY-4.0	unseen_prompt,paraphrase,composition,natural_image

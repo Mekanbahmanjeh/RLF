@@ -1,0 +1,15 @@
+cff-version: 1.2.0
+message: "If you use RLF, cite this software and the specific evidence artifacts supporting any claim."
+title: "Resonant Learning Fabric (RLF)"
+type: software
+authors:
+  - family-names: Bahmanjeh
+    given-names: Mekan
+date-released: 2026-07-24
+version: 11.0.0
+license: MIT
+repository-code: "https://github.com/MekanBahmanjeh/resonant-learning-fabric"
+abstract: >-
+  A C++23 research prototype for non-neural sparse resonant learning,
+  local adaptation, associative memory, auditable multimodal training,
+  and fail-closed capability evaluation.

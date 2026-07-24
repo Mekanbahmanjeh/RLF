@@ -1,0 +1,1 @@
+coding	software	A parser fails on an empty packet.	Reproduce the empty input, isolate the violated precondition, add a guard, and run focused regression tests.	Validate the packet before parsing and cover the empty case with a regression test.	1.0

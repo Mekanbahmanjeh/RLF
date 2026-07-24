@@ -1,0 +1,4 @@
+# RTX PRO 6000 video profile. Every frame has its own SHA-256 in the shard.
+shard_id	kind	split	modality	language	domain	format	path	source_uri	license	created_utc	sha256	preprocessing_version	teacher	evaluation_family	approved
+video-frames-0001	video	train	video-text	multi	video-generation	video_frames_tsv	shards/video_frames.tsv	<source-uri>	<license-spdx-or-contract-id>	<YYYY-MM-DD>	<sha256-of-shard>	v1	<teacher-or-none>	none	true
+video-instructions-0001	instruction	train	text	en	video-generation	tsv	shards/video-instructions-0001.tsv	<source-uri>	<license-spdx-or-contract-id>	<YYYY-MM-DD>	<sha256-of-shard>	v1	<teacher-or-none>	none	true

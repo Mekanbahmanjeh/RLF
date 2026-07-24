@@ -1,0 +1,8 @@
+Solstice-Preview is a compact image understanding and text generation research model.
+The visual fabric divides images into local patches and groups similar patches into regions.
+The language fabric predicts tokens from hierarchical contexts at several time scales.
+Sparse episodic conditioning helps the generator reuse relevant learned responses.
+Tool calls are typed, schema validated, budgeted, and executed outside the language generator.
+A CPU stores the full fabric while an optional GPU accelerates active visual comparisons and local updates.
+A six gigabyte GPU is treated as a working-set accelerator rather than the sole model store.
+The model should report uncertainty when its training evidence is weak.

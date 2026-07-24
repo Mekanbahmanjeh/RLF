@@ -1,0 +1,317 @@
+{
+  "version": 6,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 25,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "base",
+      "hidden": true,
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "cacheVariables": {
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+        "RLF_BUILD_TESTS": "ON",
+        "RLF_WARNINGS_AS_ERRORS": "ON"
+      }
+    },
+    {
+      "name": "debug",
+      "inherits": "base",
+      "displayName": "Debug",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "sanitized",
+      "inherits": "base",
+      "displayName": "Debug with ASan and UBSan",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "RLF_ENABLE_ASAN": "ON",
+        "RLF_ENABLE_UBSAN": "ON"
+      }
+    },
+    {
+      "name": "asan",
+      "inherits": "base",
+      "displayName": "Debug with AddressSanitizer",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "RLF_ENABLE_ASAN": "ON",
+        "RLF_ENABLE_UBSAN": "OFF"
+      }
+    },
+    {
+      "name": "ubsan",
+      "inherits": "base",
+      "displayName": "Debug with UndefinedBehaviorSanitizer",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "RLF_ENABLE_ASAN": "OFF",
+        "RLF_ENABLE_UBSAN": "ON"
+      }
+    },
+    {
+      "name": "release",
+      "inherits": "base",
+      "displayName": "Release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "ubuntu-release",
+      "inherits": "base",
+      "displayName": "Ubuntu CPU Release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "RLF_ENABLE_CUDA": "OFF",
+        "RLF_ENABLE_SYSTEM_IMAGE_CODECS": "ON"
+      }
+    },
+    {
+      "name": "ubuntu-rtx3090-cuda",
+      "inherits": "base",
+      "displayName": "Ubuntu RTX 3090 CUDA Release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "RLF_ENABLE_CUDA": "ON",
+        "RLF_ENABLE_SYSTEM_IMAGE_CODECS": "ON",
+        "CMAKE_CUDA_ARCHITECTURES": "86"
+      }
+    },
+    {
+      "name": "windows-msvc-release",
+      "displayName": "Windows MSVC Release",
+      "generator": "Visual Studio 17 2022",
+      "architecture": "x64",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "cacheVariables": {
+        "RLF_BUILD_TESTS": "ON",
+        "RLF_WARNINGS_AS_ERRORS": "ON",
+        "RLF_ENABLE_CUDA": "OFF"
+      }
+    },
+    {
+      "name": "windows-msvc-cuda-release",
+      "displayName": "Windows MSVC CUDA Release",
+      "generator": "Visual Studio 17 2022",
+      "architecture": "x64",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "cacheVariables": {
+        "RLF_BUILD_TESTS": "ON",
+        "RLF_WARNINGS_AS_ERRORS": "ON",
+        "RLF_ENABLE_CUDA": "ON"
+      }
+    },
+    {
+      "name": "ubuntu-h100-cuda",
+      "inherits": "base",
+      "displayName": "Ubuntu NVIDIA H100 CUDA Release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "RLF_ENABLE_CUDA": "ON",
+        "RLF_ENABLE_SYSTEM_IMAGE_CODECS": "ON",
+        "CMAKE_CUDA_ARCHITECTURES": "90"
+      }
+    },
+    {
+      "name": "ubuntu-h200-cuda",
+      "inherits": "base",
+      "displayName": "Ubuntu NVIDIA H200 CUDA Release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "RLF_ENABLE_CUDA": "ON",
+        "RLF_ENABLE_SYSTEM_IMAGE_CODECS": "ON",
+        "CMAKE_CUDA_ARCHITECTURES": "90"
+      }
+    },
+    {
+      "name": "ubuntu-general-cuda-compat",
+      "inherits": "base",
+      "displayName": "Ubuntu General CUDA 40G/V100 Compatibility Release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "RLF_ENABLE_CUDA": "ON",
+        "RLF_ENABLE_SYSTEM_IMAGE_CODECS": "ON",
+        "CMAKE_CUDA_ARCHITECTURES": "70;80"
+      }
+    },
+    {
+      "name": "ubuntu-rtx-pro-6000-cuda",
+      "inherits": "base",
+      "displayName": "Ubuntu RTX PRO 6000 Blackwell 96G CUDA Release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "RLF_ENABLE_CUDA": "ON",
+        "RLF_ENABLE_SYSTEM_IMAGE_CODECS": "ON",
+        "CMAKE_CUDA_ARCHITECTURES": "120"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "debug",
+      "configurePreset": "debug"
+    },
+    {
+      "name": "sanitized",
+      "configurePreset": "sanitized"
+    },
+    {
+      "name": "asan",
+      "configurePreset": "asan"
+    },
+    {
+      "name": "ubsan",
+      "configurePreset": "ubsan"
+    },
+    {
+      "name": "release",
+      "configurePreset": "release"
+    },
+    {
+      "name": "windows-msvc-release",
+      "configurePreset": "windows-msvc-release",
+      "configuration": "Release"
+    },
+    {
+      "name": "windows-msvc-cuda-release",
+      "configurePreset": "windows-msvc-cuda-release",
+      "configuration": "Release"
+    },
+    {
+      "name": "ubuntu-release",
+      "configurePreset": "ubuntu-release"
+    },
+    {
+      "name": "ubuntu-rtx3090-cuda",
+      "configurePreset": "ubuntu-rtx3090-cuda"
+    },
+    {
+      "name": "ubuntu-h100-cuda",
+      "configurePreset": "ubuntu-h100-cuda"
+    },
+    {
+      "name": "ubuntu-h200-cuda",
+      "configurePreset": "ubuntu-h200-cuda"
+    },
+    {
+      "name": "ubuntu-general-cuda-compat",
+      "configurePreset": "ubuntu-general-cuda-compat"
+    },
+    {
+      "name": "ubuntu-rtx-pro-6000-cuda",
+      "configurePreset": "ubuntu-rtx-pro-6000-cuda"
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "debug",
+      "configurePreset": "debug",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "sanitized",
+      "configurePreset": "sanitized",
+      "output": {
+        "outputOnFailure": true
+      },
+      "environment": {
+        "ASAN_OPTIONS": "detect_leaks=1:strict_string_checks=1",
+        "UBSAN_OPTIONS": "print_stacktrace=1:halt_on_error=1"
+      }
+    },
+    {
+      "name": "asan",
+      "configurePreset": "asan",
+      "output": {
+        "outputOnFailure": true
+      },
+      "environment": {
+        "ASAN_OPTIONS": "detect_leaks=0:strict_string_checks=1:halt_on_error=1"
+      }
+    },
+    {
+      "name": "ubsan",
+      "configurePreset": "ubsan",
+      "output": {
+        "outputOnFailure": true
+      },
+      "environment": {
+        "UBSAN_OPTIONS": "print_stacktrace=1:halt_on_error=1"
+      }
+    },
+    {
+      "name": "release",
+      "configurePreset": "release",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "windows-msvc-release",
+      "configurePreset": "windows-msvc-release",
+      "configuration": "Release",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "windows-msvc-cuda-release",
+      "configurePreset": "windows-msvc-cuda-release",
+      "configuration": "Release",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "ubuntu-release",
+      "configurePreset": "ubuntu-release",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "ubuntu-rtx3090-cuda",
+      "configurePreset": "ubuntu-rtx3090-cuda",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "ubuntu-h100-cuda",
+      "configurePreset": "ubuntu-h100-cuda",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "ubuntu-h200-cuda",
+      "configurePreset": "ubuntu-h200-cuda",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "ubuntu-general-cuda-compat",
+      "configurePreset": "ubuntu-general-cuda-compat",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "ubuntu-rtx-pro-6000-cuda",
+      "configurePreset": "ubuntu-rtx-pro-6000-cuda",
+      "output": {
+        "outputOnFailure": true
+      }
+    }
+  ]
+}

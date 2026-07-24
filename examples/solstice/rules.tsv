@@ -1,0 +1,2 @@
+# name	premises (subject,relation,object;...)	conclusion	confidence
+grandparent composition	?x,parent,?y;?y,parent,?z	?x,grandparent,?z	0.98

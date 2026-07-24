@@ -1,0 +1,2 @@
+# image_path<TAB>image_sha256<TAB>caption; paths are relative to this TSV
+../media/images/example.ppm	<sha256-of-image-file>	<single-line-caption>

@@ -1,0 +1,3 @@
+# id	prompt_path	prompt_sha256	image_path	image_sha256
+identity	identity.txt	243423f53341bb2f4df6a9c4403abb8f029e92c143b520eac90baf4576e3594a	-	-
+capabilities	capabilities.txt	05060581061e6211044ddc974cbc811382044fb4ee671c9ed8a256af48c6a0fa	-	-

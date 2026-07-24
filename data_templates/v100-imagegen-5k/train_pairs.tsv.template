@@ -1,0 +1,3 @@
+# Exactly 3,500 data rows. No header. Keep referenced files below this directory.
+# record_id<TAB>source_path_or_marker<TAB>source_sha256<TAB>target_path<TAB>target_sha256<TAB>prompt<TAB>source_uri<TAB>license_id
+train-0000001	@neutral-gray128-target-size-v1	cac3ac3dabb4ef531f7c4239cbbc8688bbc325e5e8dd2319047af919ba944360	images/train-0000001.png	<target-sha256>	render a red circle on a matte white background	https://source.example/item/1	CC-BY-4.0

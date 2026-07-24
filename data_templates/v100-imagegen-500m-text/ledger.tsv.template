@@ -1,0 +1,4 @@
+# Replace placeholder paths, provenance, licenses, dates, and SHA-256 values.
+# The train/text/text_lines record total must be exactly 500000000.
+text-en-000001	text	train	text	en	general	text_lines	shards/text-en-000001.txt	https://replace.example/source	REPLACE-LICENSE	2026-07-23	REPLACE_WITH_LOWERCASE_SHA256	normalize-v1	none	none	false
+text-en-heldout-000001	text	evaluation	text	en	general	text_lines	shards/text-en-heldout-000001.txt	https://replace.example/heldout	REPLACE-LICENSE	2026-07-23	REPLACE_WITH_LOWERCASE_SHA256	normalize-v1	none	private_prompt_holdout	false

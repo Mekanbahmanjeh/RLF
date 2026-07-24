@@ -1,0 +1,2 @@
+# image_path<TAB>image_sha256<TAB>caption
+../media/images/example.png	<sha256>	<audited caption grounded in visible content>

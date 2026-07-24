@@ -1,0 +1,5 @@
+# Replace every <...> value. Paths are relative to this ledger file.
+shard_id	kind	split	modality	language	domain	format	path	source_uri	license	created_utc	sha256	preprocessing_version	teacher	evaluation_family	approved
+text-en-0001	text	train	text	en	general	text_lines	shards/text-en-0001.txt	<source-uri>	<license-spdx-or-contract-id>	<YYYY-MM-DD>	<sha256-of-shard>	v1	none	none	true
+instructions-0001	instruction	train	text	en	instruction	tsv	shards/instructions-0001.tsv	<source-uri>	<license-spdx-or-contract-id>	<YYYY-MM-DD>	<sha256-of-shard>	v1	<teacher-or-none>	none	true
+images-0001	vision	train	image-text	multi	vision	vision_tsv	shards/vision.tsv	<source-uri>	<license-spdx-or-contract-id>	<YYYY-MM-DD>	<sha256-of-shard>	v1	<teacher-or-none>	none	true
