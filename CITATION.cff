@@ -8,7 +8,7 @@ authors:
 date-released: 2026-07-24
 version: 11.0.0
 license: MIT
-repository-code: "https://github.com/MekanBahmanjeh/resonant-learning-fabric"
+repository-code: "https://github.com/Mekanbahmanjeh/RLF"
 abstract: >-
   A C++23 research prototype for non-neural sparse resonant learning,
   local adaptation, associative memory, auditable multimodal training,

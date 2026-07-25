@@ -1,0 +1,69 @@
+name: Bug Report
+description: File a bug report for the RLF C++23 prototype.
+title: "[Bug]: "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report for the Resonant Learning Fabric.
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: A clear and concise description of what the bug is.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: Steps to reproduce the behavior.
+      placeholder: |
+        1. Compile with...
+        2. Run...
+        3. See error...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: A clear and concise description of what you expected to happen.
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: What actually happened?
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: OS, compiler, CMake preset, GPU (if applicable).
+      value: |
+        - OS: 
+        - Compiler (e.g., Clang 18, GCC 13): 
+        - CMake Preset: 
+        - GPU (if applicable): 
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Build output / error logs
+      description: Please paste relevant build output or error logs. Use code blocks.
+      render: shell
+  - type: textarea
+    id: tests
+    attributes:
+      label: Test suite results
+      description: What were the results of running the test suite? Did any specific tests fail?
+  - type: textarea
+    id: checkpoint
+    attributes:
+      label: Checkpoint info (if relevant)
+      description: Are you resuming from a specific checkpoint?

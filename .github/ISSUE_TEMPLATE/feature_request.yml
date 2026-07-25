@@ -1,0 +1,59 @@
+name: Feature Request
+description: Suggest an idea for the RLF prototype.
+title: "[Feature]: "
+labels: ["enhancement", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to suggest a feature for the Resonant Learning Fabric.
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: A clear and concise summary of the requested feature.
+    validations:
+      required: true
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Motivation & use case
+      description: Why is this feature needed? What use case does it solve?
+    validations:
+      required: true
+  - type: textarea
+    id: proposed_solution
+    attributes:
+      label: Proposed solution
+      description: A clear and concise description of what you want to happen.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: A clear and concise description of any alternative solutions or features you've considered.
+  - type: textarea
+    id: evidence_impact
+    attributes:
+      label: Impact on evidence system
+      description: Will this affect fail-closed gates or the rigorous proof requirements of the prototype?
+  - type: dropdown
+    id: milestone
+    attributes:
+      label: Related milestone
+      description: Which RLF milestone does this feature target?
+      options:
+        - RLF-0
+        - RLF-1
+        - RLF-2
+        - RLF-3
+        - RLF-4
+        - RLF-5
+        - RLF-6
+        - RLF-7
+        - Frontier
+        - Solstice
+        - Unknown
+    validations:
+      required: true

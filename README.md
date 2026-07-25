@@ -1,12 +1,37 @@
 <div align="center">
 
-# Resonant Learning Fabric (RLF)
+# 🌀 Resonant Learning Fabric (RLF)
 
-### A Non-Neural Learning Architecture — Research Prototype & Evidence Package
+<br>
 
-**Sparse resonant dynamics · phase-vector representations · local learning · no backpropagation**
+**A Non-Neural Learning Architecture — Research Prototype & Evidence Package**
 
-Built by **Mekan Bahmanjeh** · License: [MIT](LICENSE)
+*Sparse resonant dynamics · Phase-vector representations · Local learning · No backpropagation*
+
+<br>
+
+[![CI](https://github.com/Mekanbahmanjeh/RLF/actions/workflows/ci.yml/badge.svg)](https://github.com/Mekanbahmanjeh/RLF/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![C++23](https://img.shields.io/badge/C%2B%2B-23-00599C?logo=cplusplus&logoColor=white)](https://en.cppreference.com/w/cpp/23)
+[![CMake](https://img.shields.io/badge/CMake-3.25%2B-064F8C?logo=cmake&logoColor=white)](CMakeLists.txt)
+[![Version](https://img.shields.io/badge/Version-11.0.0-brightgreen)](CHANGELOG.md)
+[![Tests](https://img.shields.io/badge/Tests-261%2F261_Core_%7C_130%2F130_Solstice_%7C_12%2F12_Frontier-success)](tests/)
+[![Platform](https://img.shields.io/badge/Platform-Linux_%7C_Windows_%7C_CUDA-lightgrey?logo=linux&logoColor=white)]()
+
+<br>
+
+```
+  z ∈ ℂᴰ,  |zⱼ| = 1    ──►    One schema replaces 10,000 labels
+                                12,502.5× fewer candidates
+                                17,480× fewer components
+                                100% accuracy · controlled scope
+```
+
+<br>
+
+Built by [**Mekan Bahmanjeh**](https://github.com/Mekanbahmanjeh) · License: [MIT](LICENSE)
+
+[Quick Start](#-quick-start) · [Architecture](docs/ARCHITECTURE.md) · [Contributing](CONTRIBUTING.md) · [Changelog](CHANGELOG.md)
 
 </div>
 
@@ -46,6 +71,7 @@ Built by **Mekan Bahmanjeh** · License: [MIT](LICENSE)
 - [Engineering Standards](#-engineering-standards)
 - [Scientific Status & Honest Boundaries](#-scientific-status--honest-boundaries)
 - [License & Citation](#-license--citation)
+- [Contributing](CONTRIBUTING.md)
 
 ---
 
@@ -550,14 +576,27 @@ artifacts (validation reports, proof JSON, claim inventory) for any claim you re
   author       = {Bahmanjeh, Mekan},
   title        = {Resonant Learning Fabric (RLF): A Non-Neural Learning Architecture},
   year         = {2026},
-  howpublished = {\url{https://github.com/MekanBahmanjeh/resonant-learning-fabric}},
+  howpublished = {\url{https://github.com/Mekanbahmanjeh/RLF}},
   note         = {Research prototype; MIT License}
 }
 ```
 
 ---
 
+---
+
 <div align="center">
-<sub>Built by <strong>Mekan Bahmanjeh</strong> · Resonant Learning Fabric · MIT License ·
-Every claim gated against verifiable evidence.</sub>
+
+<br>
+
+**[📖 Architecture](docs/ARCHITECTURE.md)** · **[🤝 Contributing](CONTRIBUTING.md)** · **[📋 Changelog](CHANGELOG.md)** · **[🔒 Security](SECURITY.md)**
+
+<br>
+
+<sub>Built by <strong><a href="https://github.com/Mekanbahmanjeh">Mekan Bahmanjeh</a></strong> · Resonant Learning Fabric · MIT License · Every claim gated against verifiable evidence.</sub>
+
+<br>
+
+<sub>⭐ If you find this research interesting, please consider starring the repository.</sub>
+
 </div>

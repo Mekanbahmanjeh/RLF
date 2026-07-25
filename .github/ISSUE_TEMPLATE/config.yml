@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: GitHub Discussions
+    url: https://github.com/MekanBahmanjeh/resonant-learning-fabric/discussions
+    about: Please ask and answer questions here.
+  - name: Documentation
+    url: https://github.com/MekanBahmanjeh/resonant-learning-fabric/wiki
+    about: View the RLF documentation and research notes.

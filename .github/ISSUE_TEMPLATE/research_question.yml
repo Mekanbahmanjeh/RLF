@@ -1,0 +1,53 @@
+name: Research Question
+description: Propose a research question or experiment design.
+title: "[Research]: "
+labels: ["research", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for contributing to the research aspects of the Resonant Learning Fabric.
+  - type: textarea
+    id: question
+    attributes:
+      label: Research question
+      description: What is the primary research question?
+    validations:
+      required: true
+  - type: textarea
+    id: hypothesis
+    attributes:
+      label: Hypothesis
+      description: What is your hypothesis?
+    validations:
+      required: true
+  - type: textarea
+    id: experiment_design
+    attributes:
+      label: Proposed experiment design
+      description: How will you test this hypothesis? Outline the experimental methodology.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence_standard
+    attributes:
+      label: Required evidence standard
+      description: What are the criteria for success or rejection?
+    validations:
+      required: true
+  - type: textarea
+    id: related_claims
+    attributes:
+      label: Related claims/mechanisms
+      description: What existing RLF mechanisms or theoretical claims does this relate to?
+  - type: dropdown
+    id: scope
+    attributes:
+      label: Expected scope
+      description: Is this for a controlled/synthetic environment or external?
+      options:
+        - Controlled/Synthetic
+        - External
+        - Both
+    validations:
+      required: true
