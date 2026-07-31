@@ -61,8 +61,22 @@ Write-Host "Generating image for prompt: '$Prompt'..."
     --height $Height
 
 if ($LASTEXITCODE -eq 0) {
+    # If the user requested a .png file, automatically convert the generated PPM to PNG via Python PIL
+    if ($OutputPath.EndsWith(".png", [System.StringComparison]::OrdinalIgnoreCase)) {
+        $TmpPpm = $OutputPath + ".ppm"
+        if (Test-Path $OutputPath) {
+            Move-Item -Force $OutputPath $TmpPpm
+            python -c "from PIL import Image; Image.open(r'$TmpPpm').save(r'$OutputPath')" 2>$null
+            if (Test-Path $OutputPath) {
+                Remove-Item -Force $TmpPpm
+            } else {
+                Move-Item -Force $TmpPpm $OutputPath
+            }
+        }
+    }
     Write-Host ""
     Write-Host "Successfully generated image: $OutputPath"
 } else {
     exit $LASTEXITCODE
 }
+
