@@ -143,12 +143,25 @@ void SolsticeTokenizer::train(const std::string_view corpus) {
             static_cast<std::size_t>(right) >= pieces_.size()) {
             throw std::logic_error("Solstice tokenizer pair references unknown token");
         }
-        const std::string combined = pieces_[left].bytes + pieces_[right].bytes;
-        if (combined.size() > config_.maximum_piece_bytes) {
+        const std::string left_str = pieces_[left].bytes;
+        const std::string right_str = pieces_[right].bytes;
+        const std::string combined = left_str + right_str;
+        
+        // Prevent BPE from merging across whitespace boundaries (fixes sub-word fragmentation)
+        bool spans_whitespace = false;
+        if (!left_str.empty() && !right_str.empty()) {
+            if (std::isspace(static_cast<unsigned char>(left_str.back())) !=
+                std::isspace(static_cast<unsigned char>(right_str.front()))) {
+                spans_whitespace = true;
+            }
+        }
+
+        if (combined.size() > config_.maximum_piece_bytes || spans_whitespace) {
             counts.erase(best_key);
             if (counts.empty()) {
                 break;
             }
+
             // Avoid repeatedly selecting an oversized pair by replacing it once
             // with a count below the acceptance threshold.
             bool found_acceptable = false;

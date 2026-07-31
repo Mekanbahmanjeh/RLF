@@ -702,11 +702,22 @@ LanguageResponse HierarchicalLanguageFabric::generate_response(
 
     LanguageResponse response;
     response.episode_similarity = matches.empty() ? 0.0 : matches.front().similarity;
+    
+    // Direct Episode Attractor Routing: if a high-confidence match exists (similarity >= 0.55),
+    // output the exact matched episode response directly, avoiding auto-regressive n-gram fallback blending.
+    if (!matches.empty() && matches.front().similarity >= 0.55 && !matches.front().episode->response.empty()) {
+        response.generated_tokens = matches.front().episode->response;
+        response.text = tokenizer.decode(response.generated_tokens);
+        response.uncertainty = clamp_probability(1.0 - matches.front().similarity);
+        return response;
+    }
+
     std::uint64_t random_state = settings.seed == 0U
         ? 0x9E37'79B9'7F4A'7C15ULL
         : settings.seed;
     const TokenId eos = tokenizer.special_id("<eos>");
     double uncertainty_sum = 0.0;
+
 
     for (std::size_t position = 0U; position < settings.maximum_tokens; ++position) {
         HierarchicalPrediction prediction = predict_conditioned(
