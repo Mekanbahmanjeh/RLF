@@ -107,7 +107,9 @@ SolsticeConfig make_profile_config(const SolsticeProfile profile) {
     const bool text_only = profile == SolsticeProfile::general_v100_32g_text ||
         profile == SolsticeProfile::general_rtx_pro_6000_96g_text;
     const bool video = profile == SolsticeProfile::video_rtx_pro_6000_96g ||
-        profile == SolsticeProfile::video_v100_32g;
+        profile == SolsticeProfile::video_v100_32g ||
+        profile == SolsticeProfile::preview_6g;
+
     const bool rtx_pro_50m =
         profile == SolsticeProfile::general_rtx_pro_6000_96g ||
         profile == SolsticeProfile::rtx_pro_6000_96g;
@@ -414,7 +416,9 @@ bool profile_allows_vision(const SolsticeProfile profile) noexcept {
 
 bool profile_allows_video(const SolsticeProfile profile) noexcept {
     return profile == SolsticeProfile::video_rtx_pro_6000_96g ||
-        profile == SolsticeProfile::video_v100_32g;
+        profile == SolsticeProfile::video_v100_32g ||
+        profile == SolsticeProfile::preview_6g;
 }
+
 
 }  // namespace rlf::solstice

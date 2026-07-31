@@ -2308,7 +2308,7 @@ int run_generate_video(const Options& options) {
     const auto profile = rlf::solstice::parse_profile(options.profile);
     if (!rlf::solstice::profile_allows_video(profile)) {
         throw std::invalid_argument(
-            "generate-video requires --profile video-rtx-pro-6000-96g"
+            "generate-video requires a video-enabled profile"
         );
     }
     if (!std::filesystem::is_regular_file(options.checkpoint)) {
@@ -2323,8 +2323,9 @@ int run_generate_video(const Options& options) {
             checkpoint_limits(options)
         );
     if (!rlf::solstice::profile_config_matches(profile, model.config())) {
-        throw std::runtime_error("checkpoint is not the enforced RTX video profile");
+        throw std::runtime_error("checkpoint is not the enforced video profile");
     }
+
     const rlf::solstice::VideoGeneration generation = model.generate_video(
         options.prompt, options.video_frames
     );
