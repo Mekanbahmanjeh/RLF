@@ -147,20 +147,27 @@ void SolsticeTokenizer::train(const std::string_view corpus) {
         const std::string right_str = pieces_[right].bytes;
         const std::string combined = left_str + right_str;
         
-        // Prevent BPE from merging across whitespace boundaries (fixes sub-word fragmentation)
-        bool spans_whitespace = false;
-        if (!left_str.empty() && !right_str.empty()) {
-            if (std::isspace(static_cast<unsigned char>(left_str.back())) !=
-                std::isspace(static_cast<unsigned char>(right_str.front()))) {
-                spans_whitespace = true;
-            }
+        // Prevent BPE from merging whitespace with non-whitespace characters (fixes token corruption)
+        bool left_has_space = false;
+        bool right_has_space = false;
+        bool left_has_nonspace = false;
+        bool right_has_nonspace = false;
+        for (const char c : left_str) {
+            if (std::isspace(static_cast<unsigned char>(c))) left_has_space = true;
+            else left_has_nonspace = true;
         }
+        for (const char c : right_str) {
+            if (std::isspace(static_cast<unsigned char>(c))) right_has_space = true;
+            else right_has_nonspace = true;
+        }
+        const bool spans_whitespace = (left_has_space && right_has_nonspace) || (left_has_nonspace && right_has_space);
 
         if (combined.size() > config_.maximum_piece_bytes || spans_whitespace) {
             counts.erase(best_key);
             if (counts.empty()) {
                 break;
             }
+
 
             // Avoid repeatedly selecting an oversized pair by replacing it once
             // with a count below the acceptance threshold.

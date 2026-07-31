@@ -80,18 +80,24 @@ void hash_double(std::uint64_t& hash, const double value) noexcept {
     std::vector<TokenId> unique;
     unique.reserve(tokens.size());
     for (const TokenId token : tokens) {
+        TokenId normalized = token;
         if (token < 256U) {
             const unsigned char byte = static_cast<unsigned char>(token);
             if (byte <= 32U) {
                 continue;
             }
+            // Case-insensitive normalization for basic byte tokens
+            if (byte >= 'A' && byte <= 'Z') {
+                normalized = static_cast<TokenId>(byte + ('a' - 'A'));
+            }
         }
-        unique.push_back(token);
+        unique.push_back(normalized);
     }
     std::sort(unique.begin(), unique.end());
     unique.erase(std::unique(unique.begin(), unique.end()), unique.end());
     return unique;
 }
+
 
 [[nodiscard]] double jaccard_similarity(
     const std::span<const TokenId> left,
@@ -703,14 +709,15 @@ LanguageResponse HierarchicalLanguageFabric::generate_response(
     LanguageResponse response;
     response.episode_similarity = matches.empty() ? 0.0 : matches.front().similarity;
     
-    // Direct Episode Attractor Routing: if a high-confidence match exists (similarity >= 0.55),
+    // Direct Episode Attractor Routing: if a high-confidence match exists (similarity >= 0.45),
     // output the exact matched episode response directly, avoiding auto-regressive n-gram fallback blending.
-    if (!matches.empty() && matches.front().similarity >= 0.55 && !matches.front().episode->response.empty()) {
+    if (!matches.empty() && matches.front().similarity >= 0.45 && !matches.front().episode->response.empty()) {
         response.generated_tokens = matches.front().episode->response;
         response.text = tokenizer.decode(response.generated_tokens);
         response.uncertainty = clamp_probability(1.0 - matches.front().similarity);
         return response;
     }
+
 
     std::uint64_t random_state = settings.seed == 0U
         ? 0x9E37'79B9'7F4A'7C15ULL
