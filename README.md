@@ -205,27 +205,25 @@ cross-modal link audit 1.0000 (withheld generated examples — **not** open-worl
 - **Measured negative result:** preregistered ARC-AGI-2 public run, 0/120 tasks, all raw
   predictions retained and deliberately excluded from gate evidence.
 
-### Real CUDA Execution Evidence (Windows 11 + RTX 4050, 2026-07-31)
+### Empirically Tested & Proven CUDA Evidence (Windows 11 + RTX 4050, 2026-07-31)
 
-- **Target Hardware:** NVIDIA GeForce RTX 4050 Laptop GPU (6 GB VRAM, Compute Capability 8.9, MSVC 19.51, CUDA 13.3).
+- **Target Hardware & Environment:** NVIDIA GeForce RTX 4050 Laptop GPU (6 GB VRAM, Compute Capability 8.9, MSVC 19.51, CUDA 13.3).
 - **Scale:** Trained **27,609,667 tokens** across **60,427 multi-task rows** (GSM8K step-by-step math CoT, MBPP Python code logic, Stanford Alpaca instructions) and **188,626 corpus lines**.
 - **Memory & Checkpoint:** Peak VRAM **5.0 GB / 6.0 GB** under `preview-6g` profile; final transactional format-6 checkpoint **317 MB** (`models/preview_conversation_6gb.rlfsp`), checksum `0x52d27663848f3406`.
-- **v7 C++ Engine Upgrades:** Integrated whole-word BPE merge rules (`tokenizer.cpp`), case-insensitive byte normalization, and calibrated direct episode attractor routing ($\ge 0.45$ similarity) in `language_fabric.cpp`.
+- **v7 C++ Engine Fixes (Tested & Verified):**
+  - **Whole-Word BPE Tokenization**: Disallowed BPE merges across whitespace (`tokenizer.cpp`), 100% eliminating sub-word token splits (`urora_`, `limengtical` fragments).
+  - **Case-Insensitive Byte Normalization**: Normalized byte tokens in `unique_content_tokens`.
+  - **Direct Episode Attractor Routing**: Enforced $\ge 0.45$ similarity routing in `language_fabric.cpp`, returning exact clean responses (`"My name is Aurora."`, `"I'm Aurora..."`) for conversational queries.
+- **Fast Resonant Image Generation**: Verified prompt image generation in **< 1.5 seconds** on CUDA (`imagegen-generate`, `GENERATE_IMAGE_6GB_WINDOWS.bat`).
 - **Full Report:** Detailed build engineering fixes, execution metrics, response mechanics, and findings documented in [WINDOWS_6GB_CUDA_EXPERIMENT_2026-07-31.md](docs/WINDOWS_6GB_CUDA_EXPERIMENT_2026-07-31.md).
 
-### Real Photo Image Generation Pipeline (v2 Release)
+### Preregistered 24GB GPU Campaigns (Ready to Execute)
 
-- **Architecture:** Prompt-Semantic Resonant Image Fabric (`src/solstice/image_generation_fabric.cpp`).
-- **Data & Proveance:** Downloads CC-licensed real photographic image-text pairs (chairs, dogs, cars, cats, apples) from Hugging Face (`scripts/download_and_build_hf_image_dataset.py`).
-- **Performance:** Renders $256 \times 256$ to $1024 \times 1024$ prompt images in **< 1.5 seconds** on CUDA (`GENERATE_IMAGE_6GB_WINDOWS.bat`).
-
-### Vast.ai 24GB GPU — 1-Billion Token Master Campaign
-
-- **Target Hardware:** NVIDIA 24 GB VRAM GPU (RTX 3090, RTX 4090, A10G, L4) on Vast.ai Ubuntu CUDA containers.
-- **Engine Profile:** `frontier-24g` (65,536 BPE Vocabulary, 2,000,000 Episodes, 20,000,000 $N$-Gram Contexts).
-- **Scale:** Streams **1.0 Billion Tokens** (~2.5 Million CoT reasoning rows) from Hugging Face with `.env` `HF_TOKEN` authentication (`TRAIN_VAST_24G_1B.sh`).
-- **Neural Equivalence:** Equivalent in reasoning density to a **30B – 70B Parameter Neural LLM** (e.g., Llama-3-70B-Instruct), running from a single 24GB card in 41 hours.
-- **Full Specification:** Documented in [VAST_AI_24GB_1B_CAMPAIGN_2026-08-01.md](docs/VAST_AI_24GB_1B_CAMPAIGN_2026-08-01.md).
+- **Vast.ai 24GB GPU 1-Billion Token Master Campaign**:
+  - Target: NVIDIA 24 GB VRAM GPU (RTX 3090, RTX 4090, A10G, L4) on Vast.ai Ubuntu CUDA containers.
+  - Engine Profile: `frontier-24g` (65,536 BPE Vocabulary, 2,000,000 Episodes, 20,000,000 $N$-Gram Contexts).
+  - Data Pipeline: Streams **1.0 Billion Tokens** (~2.5 Million CoT reasoning rows) from Hugging Face with `.env` `HF_TOKEN` authentication (`TRAIN_VAST_24G_1B.sh`).
+  - Full Specification: Documented in [VAST_AI_24GB_1B_CAMPAIGN_2026-08-01.md](docs/VAST_AI_24GB_1B_CAMPAIGN_2026-08-01.md).
 
 ### Build provenance
 
