@@ -22,6 +22,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(CompilerWarnings)
 include(Sanitizers)
+include(CMakePackageConfigHelpers)
 
 add_library(rlf_project_options INTERFACE)
 rlf_set_project_warnings(rlf_project_options)
@@ -78,6 +79,9 @@ add_library(rlf_core
     src/memory/associative_memory.cpp
     src/retrieval/exact_mode_retriever.cpp
     src/retrieval/contiguous_mode_index.cpp
+    src/sdk/pipeline.cpp
+    src/sdk/session.cpp
+    src/sdk/trainer.cpp
     src/storage/checkpoint.cpp
     src/storage/rlf1_checkpoint.cpp
     src/storage/rlf2_checkpoint.cpp
@@ -114,6 +118,8 @@ add_library(rlf_core
     src/solstice/checkpoint.cpp
 )
 add_library(rlf::core ALIAS rlf_core)
+set_target_properties(rlf_core PROPERTIES EXPORT_NAME core)
+set_target_properties(rlf_project_options PROPERTIES EXPORT_NAME project_options)
 
 if(RLF_ENABLE_CUDA)
     enable_language(CUDA)
@@ -182,8 +188,45 @@ if(WIN32)
 endif()
 
 include(GNUInstallDirs)
-install(TARGETS rlf solstice rlf_frontier_benchmark rlf_efficiency_proof rlf_efficiency_campaign rlf_general_benchmark rlf_arc_agi2 RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}")
+install(
+    TARGETS rlf_core rlf_project_options
+    EXPORT RLFTargets
+    ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+    LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+    INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
+)
+install(
+    TARGETS rlf solstice rlf_frontier_benchmark rlf_efficiency_proof
+        rlf_efficiency_campaign rlf_general_benchmark rlf_arc_agi2
+    RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
+)
 install(DIRECTORY include/ DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}")
+
+set(RLF_CONFIG_NEEDS_CUDA "${RLF_ENABLE_CUDA}")
+set(RLF_CONFIG_NEEDS_PNG "${PNG_FOUND}")
+set(RLF_CONFIG_NEEDS_JPEG "${JPEG_FOUND}")
+configure_package_config_file(
+    cmake/RLFConfig.cmake.in
+    "${CMAKE_CURRENT_BINARY_DIR}/RLFConfig.cmake"
+    INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/RLF"
+)
+write_basic_package_version_file(
+    "${CMAKE_CURRENT_BINARY_DIR}/RLFConfigVersion.cmake"
+    VERSION "${PROJECT_VERSION}"
+    COMPATIBILITY SameMajorVersion
+)
+install(
+    EXPORT RLFTargets
+    FILE RLFTargets.cmake
+    NAMESPACE rlf::
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/RLF"
+)
+install(
+    FILES
+        "${CMAKE_CURRENT_BINARY_DIR}/RLFConfig.cmake"
+        "${CMAKE_CURRENT_BINARY_DIR}/RLFConfigVersion.cmake"
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/RLF"
+)
 
 if(RLF_BUILD_TESTS)
     include(CTest)

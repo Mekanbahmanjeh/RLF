@@ -56,6 +56,7 @@ add_executable(rlf_tests
     test_image_generation_data_audit.cpp
     test_resonant_image_fabric.cpp
     test_prompt_semantic_fabric.cpp
+    test_sdk.cpp
 )
 target_link_libraries(rlf_tests PRIVATE rlf::core)
 target_include_directories(rlf_tests PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
@@ -93,6 +94,7 @@ add_executable(solstice_tests
     test_prompt_semantic_fabric.cpp
     test_data_pipeline.cpp
     test_evaluation_runner.cpp
+    test_sdk.cpp
 )
 target_link_libraries(solstice_tests PRIVATE rlf::core)
 target_include_directories(solstice_tests PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")

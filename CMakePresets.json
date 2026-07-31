@@ -109,6 +109,30 @@
       }
     },
     {
+      "name": "windows-vs2026-release",
+      "displayName": "Windows Visual Studio 2026 Release",
+      "generator": "Visual Studio 18 2026",
+      "architecture": "x64",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "cacheVariables": {
+        "RLF_BUILD_TESTS": "ON",
+        "RLF_WARNINGS_AS_ERRORS": "ON",
+        "RLF_ENABLE_CUDA": "OFF"
+      }
+    },
+    {
+      "name": "windows-vs2026-cuda-release",
+      "displayName": "Windows Visual Studio 2026 CUDA Release",
+      "generator": "Visual Studio 18 2026",
+      "architecture": "x64",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "cacheVariables": {
+        "RLF_BUILD_TESTS": "ON",
+        "RLF_WARNINGS_AS_ERRORS": "ON",
+        "RLF_ENABLE_CUDA": "ON"
+      }
+    },
+    {
       "name": "ubuntu-h100-cuda",
       "inherits": "base",
       "displayName": "Ubuntu NVIDIA H100 CUDA Release",
@@ -182,6 +206,16 @@
     {
       "name": "windows-msvc-cuda-release",
       "configurePreset": "windows-msvc-cuda-release",
+      "configuration": "Release"
+    },
+    {
+      "name": "windows-vs2026-release",
+      "configurePreset": "windows-vs2026-release",
+      "configuration": "Release"
+    },
+    {
+      "name": "windows-vs2026-cuda-release",
+      "configurePreset": "windows-vs2026-cuda-release",
       "configuration": "Release"
     },
     {
@@ -266,6 +300,22 @@
     {
       "name": "windows-msvc-cuda-release",
       "configurePreset": "windows-msvc-cuda-release",
+      "configuration": "Release",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "windows-vs2026-release",
+      "configurePreset": "windows-vs2026-release",
+      "configuration": "Release",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "windows-vs2026-cuda-release",
+      "configurePreset": "windows-vs2026-cuda-release",
       "configuration": "Release",
       "output": {
         "outputOnFailure": true

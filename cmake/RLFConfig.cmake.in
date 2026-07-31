@@ -1,0 +1,15 @@
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+
+if(@RLF_CONFIG_NEEDS_CUDA@)
+    find_dependency(CUDAToolkit)
+endif()
+if(@RLF_CONFIG_NEEDS_PNG@)
+    find_dependency(PNG)
+endif()
+if(@RLF_CONFIG_NEEDS_JPEG@)
+    find_dependency(JPEG)
+endif()
+
+include("${CMAKE_CURRENT_LIST_DIR}/RLFTargets.cmake")

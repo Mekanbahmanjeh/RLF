@@ -11,6 +11,8 @@
 #include "rlf/solstice/vision_fabric.hpp"
 
 #include "rlf/core/sha256.hpp"
+#include "rlf/sdk/pipeline.hpp"
+#include "rlf/sdk/session.hpp"
 
 #include <algorithm>
 #include <array>
@@ -76,12 +78,15 @@ struct Options final {
     std::size_t maximum_new_shards{};
     std::size_t maximum_token_hash_cache_entries{};
     std::size_t maximum_prompt_bytes{16U * 1024U * 1024U};
+    std::size_t chat_context_tokens{};
+    std::size_t chat_turns{16U};
     std::uint64_t maximum_text_shard_bytes{2ULL * 1024ULL * 1024ULL * 1024ULL};
     std::uint64_t maximum_train_shard_bytes{4ULL * 1024ULL * 1024ULL * 1024ULL};
     std::uint64_t target_training_records{};
     std::uint64_t target_training_tokens{};
     unsigned int near_duplicate_hamming_distance{3U};
     double temperature{0.8};
+    std::string system_prompt;
     bool stochastic{};
     bool blank{};
     bool enforce_profile{};
@@ -283,6 +288,20 @@ template <typename Integer>
                 require_value(argument_count, argument_values, index, argument),
                 argument
             );
+        } else if (argument == "--context-tokens") {
+            options.chat_context_tokens = parse_integer<std::size_t>(
+                require_value(argument_count, argument_values, index, argument),
+                argument
+            );
+        } else if (argument == "--chat-turns") {
+            options.chat_turns = parse_integer<std::size_t>(
+                require_value(argument_count, argument_values, index, argument),
+                argument
+            );
+        } else if (argument == "--system-prompt") {
+            options.system_prompt = require_value(
+                argument_count, argument_values, index, argument
+            );
         } else if (argument == "--max-text-shard-bytes") {
             options.maximum_text_shard_bytes = parse_integer<std::uint64_t>(
                 require_value(argument_count, argument_values, index, argument),
@@ -425,6 +444,9 @@ void print_help(std::ostream& output) {
         "  --separate-vision-analysis Training ablation: repeat visual feature extraction\n"
         "  --copy-tsv-fields RTX ingest ablation: allocate owned strings per TSV row\n"
         "  --max-prompt-bytes N  Per-example batch prompt limit (default 16 MiB)\n"
+        "  --context-tokens N  Token budget for stateful --no-tools chat\n"
+        "  --chat-turns N      Maximum retained stateful chat turns (default 16)\n"
+        "  --system-prompt TEXT  Optional stateful --no-tools chat instruction\n"
         "  --enable-tools     Enable safe builtins for evaluate-batch (off by default)\n"
         "  --no-tools         Disable tool routing for ask/chat\n\n"
         "Ubuntu builds use libpng/libjpeg when available and always support PPM/PGM/BMP.\n"
@@ -751,6 +773,17 @@ void print_response(const rlf::solstice::SolsticeResponse& response) {
               << response.uncertainty << "]\n";
 }
 
+void print_response(const rlf::sdk::PipelineOutput& response) {
+    if (response.vision.has_value()) {
+        std::cout << "[vision confidence=" << std::fixed << std::setprecision(3)
+                  << response.vision->confidence << "] "
+                  << response.vision->description << '\n';
+    }
+    std::cout << "Solstice: " << response.text << '\n'
+              << "[uncertainty=" << std::fixed << std::setprecision(3)
+              << response.uncertainty << "]\n";
+}
+
 int run_profile_info(const Options& options) {
     const rlf::solstice::SolsticeProfile profile =
         rlf::solstice::parse_profile(options.profile);
@@ -1027,6 +1060,73 @@ int run_chat(const Options& options) {
         !rlf::solstice::profile_allows_vision(profile)) {
         throw std::invalid_argument("image input is disabled by the enforced profile");
     }
+    if (options.disable_tools) {
+        rlf::sdk::LoadOptions load_options;
+        load_options.backend = parse_backend(options.backend);
+        load_options.profile = profile;
+        load_options.enforce_profile = options.enforce_profile;
+        rlf::sdk::AutoModel model = rlf::sdk::AutoModel::from_pretrained(
+            options.checkpoint, load_options
+        );
+        rlf::sdk::PipelineOptions pipeline_options;
+        pipeline_options.generation = generation_settings(options);
+        rlf::sdk::ChatSession session(
+            rlf::sdk::Pipeline(
+                rlf::solstice::profile_allows_vision(profile)
+                    ? rlf::sdk::PipelineTask::image_text_to_text
+                    : rlf::sdk::PipelineTask::text_generation,
+                std::move(model),
+                pipeline_options
+            ),
+            rlf::sdk::ContextWindowConfig{
+                options.chat_context_tokens,
+                options.chat_turns,
+                options.system_prompt,
+            }
+        );
+        std::optional<std::filesystem::path> image = options.image;
+        std::cout << "Solstice stateful conversation. Commands: /image PATH, "
+                     "/clear-image, /clear, /context, /quit\n";
+        std::string line;
+        while (true) {
+            std::cout << "You: " << std::flush;
+            if (!std::getline(std::cin, line)) {
+                break;
+            }
+            if (line == "/quit" || line == "/exit") {
+                break;
+            }
+            if (line == "/clear") {
+                session.clear();
+                std::cout << "Conversation context cleared.\n";
+                continue;
+            }
+            if (line == "/context") {
+                const auto stats = session.context_stats();
+                std::cout << "context_tokens=" << stats.input_tokens << '/'
+                          << stats.maximum_context_tokens << '\n'
+                          << "retained_messages=" << stats.retained_messages << '\n'
+                          << "evicted_messages=" << stats.evicted_messages << '\n';
+                continue;
+            }
+            if (line == "/clear-image") {
+                image.reset();
+                std::cout << "Image context cleared.\n";
+                continue;
+            }
+            if (line.starts_with("/image ")) {
+                image = std::filesystem::path(line.substr(7U));
+                std::cout << "Image context set to " << image->string() << "\n";
+                continue;
+            }
+            if (line.empty()) {
+                continue;
+            }
+            print_response(session.send(line, image));
+        }
+        return 0;
+    }
+
     rlf::solstice::SolsticeModel model =
         rlf::solstice::load_solstice_checkpoint(
             options.checkpoint,

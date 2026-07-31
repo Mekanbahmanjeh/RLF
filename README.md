@@ -205,6 +205,13 @@ cross-modal link audit 1.0000 (withheld generated examples — **not** open-worl
 - **Measured negative result:** preregistered ARC-AGI-2 public run, 0/120 tasks, all raw
   predictions retained and deliberately excluded from gate evidence.
 
+### Real CUDA Execution Evidence (Windows 11 + RTX 4050, 2026-07-31)
+
+- **Target Hardware:** NVIDIA GeForce RTX 4050 Laptop GPU (6 GB VRAM, Compute Capability 8.9, MSVC 19.51, CUDA 13.3).
+- **Scale:** Trained **27,609,667 tokens** across **60,427 multi-task rows** (GSM8K step-by-step math CoT, MBPP Python code logic, Stanford Alpaca instructions) and **188,626 corpus lines**.
+- **Memory & Checkpoint:** Peak VRAM **5.0 GB / 6.0 GB** under `preview-6g` profile; final transactional format-6 checkpoint **317 MB** (`models/preview_conversation_6gb.rlfsp`), checksum `0x52d27663848f3406`.
+- **Full Report:** Detailed build engineering fixes, execution metrics, response mechanics, and findings documented in [WINDOWS_6GB_CUDA_EXPERIMENT_2026-07-31.md](docs/WINDOWS_6GB_CUDA_EXPERIMENT_2026-07-31.md).
+
 ### Build provenance
 
 All binaries are built from the sources in this repository with the CMake presets in
@@ -405,6 +412,28 @@ solstice ask --backend cuda --checkpoint models/m.rlfsp --prompt "What can you d
 solstice ask --backend cuda --checkpoint models/m.rlfsp --image /data/x.png --prompt "What do you see?"
 solstice chat --backend cuda --checkpoint models/m.rlfsp --tool-root /data/safe_tool_root
 ```
+
+Applications can use the stable local-first C++ SDK instead of shelling out to the CLI:
+
+```cpp
+#include <rlf/sdk/pipeline.hpp>
+
+const auto model = rlf::sdk::AutoModel::from_pretrained("/models/my-rlf-bundle");
+const rlf::sdk::Pipeline generate(
+    rlf::sdk::PipelineTask::text_generation, model
+);
+const auto answer = generate("What can you do?");
+```
+
+Verified bundle format, multimodal pipelines, tool opt-in, and CMake package usage are documented in
+[`docs/SDK.md`](docs/SDK.md).
+
+The SDK also provides token-bounded multi-turn `ChatSession`, explicit predictive/episodic/retrieval
+context limits, typed local `Trainer` records, blank profile creation, and `save_pretrained`.
+
+For a complete Windows 6 GB conversation experiment, run
+`TRAIN_PREVIEW_6GB_WINDOWS.bat` followed by `CHAT_PREVIEW_6GB_WINDOWS.bat`; see
+[`docs/WINDOWS_6GB_DEMO.md`](docs/WINDOWS_6GB_DEMO.md).
 
 File tools are disabled unless a sandbox is supplied; built-ins are calculator, current time,
 sandboxed file reading, and directory listing. No default shell or network execution.

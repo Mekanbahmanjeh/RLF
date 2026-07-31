@@ -23,6 +23,7 @@ compile_commands.json
 /CODEX_GOAL.txt
 # Training-run checkpoints (keep curated models/ instead).
 *.rlf
+*.rlfsp
 
 # ── OS / editor noise ─────────────────────────────────────────
 *.Zone.Identifier
@@ -36,9 +37,13 @@ Desktop.ini
 .vscode/
 .idea/
 
-# ── Misc ──────────────────────────────────────────────────────
 *.log
 *.tmp
 *.bak
 /core
 /core.*
+/demo_data/
+/packages/*.zip
+/packages/*.sha256
+.env
+/RLF-One-H100-Frontier-Codex-Campaign/
