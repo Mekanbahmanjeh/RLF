@@ -44,6 +44,8 @@ Desktop.ini
 /core.*
 /demo_data/
 /packages/*.zip
+/packages/*.tar.gz
 /packages/*.sha256
 .env
 /RLF-One-H100-Frontier-Codex-Campaign/
+
