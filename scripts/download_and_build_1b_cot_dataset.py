@@ -81,8 +81,7 @@ def load_alpaca(cache_dir: Path, max_samples: int):
     return None
 
 def load_openorca(cache_dir: Path, max_samples: int):
-    """Load SlimOrca (parquet-based, no loading script) via HF datasets."""
-    # Use SlimOrca-Dedup (parquet format, no trust_remote_code needed)
+    """Load SlimOrca (parquet-based) via HF datasets."""
     for dataset_id in ["Open-Orca/SlimOrca-Dedup", "Open-Orca/SlimOrca"]:
         try:
             from datasets import load_dataset
@@ -95,24 +94,8 @@ def load_openorca(cache_dir: Path, max_samples: int):
         except Exception as e:
             print(f"[-] {dataset_id} failed: {e}")
             continue
-    
-    # Final fallback: try streaming
-    try:
-        from datasets import load_dataset
-        print("[+] Trying OpenOrca streaming fallback...")
-        ds = load_dataset("Open-Orca/OpenOrca", split="train", streaming=True)
-        rows = []
-        for i, row in enumerate(ds):
-            if i >= max_samples:
-                break
-            rows.append(row)
-            if (i + 1) % 50000 == 0:
-                print(f"    ... streamed {i+1} rows")
-        print(f"[+] OpenOrca loaded: {len(rows)} rows")
-        return rows
-    except Exception as e:
-        print(f"[-] OpenOrca load failed (non-critical): {e}")
-        return None
+    return None
+
 
 def process_gsm8k_dataset(ds, instructions: list, corpus: list, max_samples: int):
     """Process GSM8K HF dataset object into CoT rows."""
