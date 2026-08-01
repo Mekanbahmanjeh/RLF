@@ -40,7 +40,7 @@ def load_gsm8k(cache_dir: Path, max_samples: int):
     try:
         from datasets import load_dataset
         print("[+] Loading GSM8K from Hugging Face...")
-        ds = load_dataset("openai/gsm8k", "main", split="train", trust_remote_code=True)
+        ds = load_dataset("openai/gsm8k", "main", split="train")
         print(f"[+] GSM8K loaded: {len(ds)} rows")
         return ds
     except Exception as e:
@@ -50,7 +50,7 @@ def load_gsm8k(cache_dir: Path, max_samples: int):
     for dataset_id in ["gsm8k", "openai/gsm8k"]:
         try:
             from datasets import load_dataset
-            ds = load_dataset(dataset_id, "main", split="train", trust_remote_code=True)
+            ds = load_dataset(dataset_id, "main", split="train")
             print(f"[+] GSM8K loaded via {dataset_id}: {len(ds)} rows")
             return ds
         except Exception:
@@ -63,7 +63,7 @@ def load_alpaca(cache_dir: Path, max_samples: int):
     try:
         from datasets import load_dataset
         print("[+] Loading Alpaca from Hugging Face...")
-        ds = load_dataset("tatsu-lab/alpaca", split="train", trust_remote_code=True)
+        ds = load_dataset("tatsu-lab/alpaca", split="train")
         print(f"[+] Alpaca loaded: {len(ds)} rows")
         return ds
     except Exception as e:
@@ -72,7 +72,7 @@ def load_alpaca(cache_dir: Path, max_samples: int):
     # Fallback: try yahma/alpaca-cleaned
     try:
         from datasets import load_dataset
-        ds = load_dataset("yahma/alpaca-cleaned", split="train", trust_remote_code=True)
+        ds = load_dataset("yahma/alpaca-cleaned", split="train")
         print(f"[+] Alpaca-Cleaned loaded: {len(ds)} rows")
         return ds
     except Exception as e:
@@ -81,18 +81,33 @@ def load_alpaca(cache_dir: Path, max_samples: int):
     return None
 
 def load_openorca(cache_dir: Path, max_samples: int):
-    """Load OpenOrca subset via HF datasets library."""
+    """Load SlimOrca (parquet-based, no loading script) via HF datasets."""
+    # Use SlimOrca-Dedup (parquet format, no trust_remote_code needed)
+    for dataset_id in ["Open-Orca/SlimOrca-Dedup", "Open-Orca/SlimOrca"]:
+        try:
+            from datasets import load_dataset
+            print(f"[+] Loading {dataset_id} from Hugging Face...")
+            ds = load_dataset(dataset_id, split="train")
+            if len(ds) > max_samples:
+                ds = ds.select(range(max_samples))
+            print(f"[+] {dataset_id} loaded: {len(ds)} rows")
+            return ds
+        except Exception as e:
+            print(f"[-] {dataset_id} failed: {e}")
+            continue
+    
+    # Final fallback: try streaming
     try:
         from datasets import load_dataset
-        print("[+] Loading OpenOrca from Hugging Face (streaming)...")
-        ds = load_dataset("Open-Orca/OpenOrca", split="train", streaming=True, trust_remote_code=True)
+        print("[+] Trying OpenOrca streaming fallback...")
+        ds = load_dataset("Open-Orca/OpenOrca", split="train", streaming=True)
         rows = []
         for i, row in enumerate(ds):
             if i >= max_samples:
                 break
             rows.append(row)
             if (i + 1) % 50000 == 0:
-                print(f"    ... streamed {i+1} OpenOrca rows")
+                print(f"    ... streamed {i+1} rows")
         print(f"[+] OpenOrca loaded: {len(rows)} rows")
         return rows
     except Exception as e:
