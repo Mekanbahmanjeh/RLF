@@ -1,59 +1,69 @@
 #!/usr/bin/env python3
 """
-Hugging Face 1-Billion Token Multi-Dataset CoT Streamer for Vast.ai 24GB GPU
-=============================================================================
-Streams and formats 1.0 Billion Tokens (~500K to 1.5M CoT reasoning rows)
-across open Hugging Face datasets:
-1. MetaMathQA (395K step-by-step math reasoning CoT rows)
-2. Stanford Alpaca (52K general instruction rows)
-3. WizardLM Evol Instruct (70K complex reasoning rows)
-4. Camel-AI Science Suite: Math, Physics, Chemistry, Biology (110K science CoT rows)
-5. Python Code Instructions (18K coding problem solving rows)
-6. Open-Platypus (25K STEM reasoning rows)
-7. GSM8K (7.5K arithmetic CoT rows)
+Direct HTTP CoT Dataset Streamer for Vast.ai 24GB GPU
+=====================================================
+Downloads direct raw JSON/JSONL datasets via standard HTTP (no HF API middleware):
+1. MetaMathQA (395,000 step-by-step math reasoning CoT rows)
+2. Stanford Alpaca (52,002 multi-task instruction rows)
+3. CodeAlpaca 20K (20,022 programming & algorithm design rows)
+4. Databricks Dolly 15K (15,000 instruction & Q&A rows)
+5. GSM8K (7,473 arithmetic CoT rows)
 
-Outputs clean instructions.tsv and corpus.txt for RLF Frontier-24G CUDA training.
+Total: ~490,000 high-density CoT reasoning rows (~500M Tokens).
 """
 
 import os
 import sys
 import json
-import subprocess
+import urllib.request
 import argparse
 from pathlib import Path
 
-def load_dotenv():
-    """Load HF_TOKEN from .env file in workspace if available."""
-    for env_path in [Path(".env"), Path("../.env"), Path("../../.env")]:
-        if env_path.exists():
-            with open(env_path, "r", encoding="utf-8") as f:
-                for line in f:
-                    line = line.strip()
-                    if line and not line.startswith("#") and "=" in line:
-                        k, v = line.split("=", 1)
-                        os.environ[k.strip()] = v.strip().strip("'\"")
-
-def ensure_datasets_installed():
-    """Ensure HF datasets library is installed."""
-    try:
-        import datasets
-        return True
-    except ImportError:
-        print("[+] Installing HF datasets library...")
-        subprocess.check_call([sys.executable, "-m", "pip", "install", "datasets", "-q"])
+def download_raw_file(url: str, dest_path: Path):
+    """Download a file via standard HTTP with progress reporting."""
+    if dest_path.exists() and dest_path.stat().st_size > 1000:
+        print(f"[+] Using cached file: {dest_path.name} ({dest_path.stat().st_size} bytes)", flush=True)
         return True
 
-def process_gsm8k(instructions: list, corpus: list, max_samples: int):
-    """GSM8K Math CoT (7.5K rows)."""
+    print(f"[+] Downloading raw dataset from {url}...", flush=True)
+    headers = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64)"}
+    req = urllib.request.Request(url, headers=headers)
+    
     try:
-        from datasets import load_dataset
-        print("[+] Loading GSM8K math dataset...")
-        ds = load_dataset("openai/gsm8k", "main", split="train")
-        count = 0
-        for row in ds:
-            if count >= max_samples: break
-            q = str(row.get("question", "")).replace("\t", " ").replace("\r", "").replace("\n", " ").strip()
-            raw_a = str(row.get("answer", ""))
+        with urllib.request.urlopen(req, timeout=180) as resp, open(dest_path, "wb") as out_file:
+            total = int(resp.headers.get("Content-Length", 0))
+            downloaded = 0
+            block_size = 131072
+            while True:
+                buffer = resp.read(block_size)
+                if not buffer:
+                    break
+                downloaded += len(buffer)
+                out_file.write(buffer)
+                if total > 0:
+                    percent = (downloaded / total) * 100
+                    sys.stdout.write(f"\r    Downloaded {downloaded / (1024*1024):.2f} MB / {total / (1024*1024):.2f} MB ({percent:.1f}%)")
+                    sys.stdout.flush()
+        print(f"\n[+] Download complete: {dest_path.name}", flush=True)
+        return True
+    except Exception as e:
+        print(f"\n[-] Download failed for {url}: {e}", flush=True)
+        if dest_path.exists():
+            dest_path.unlink()
+        return False
+
+def process_gsm8k(input_file: Path, instructions: list, corpus: list, max_samples: int):
+    """GSM8K (7,473 rows)."""
+    print("[+] Processing GSM8K math reasoning dataset...", flush=True)
+    count = 0
+    with open(input_file, "r", encoding="utf-8") as f:
+        for line in f:
+            if max_samples and count >= max_samples: break
+            if not line.strip(): continue
+            try: data = json.loads(line)
+            except Exception: continue
+            q = str(data.get("question", "")).replace("\t", " ").replace("\r", "").replace("\n", " ").strip()
+            raw_a = str(data.get("answer", ""))
             if "####" in raw_a:
                 parts = raw_a.split("####")
                 steps = parts[0].strip().replace("\t", " ").replace("\r", "").replace("\n", " ")
@@ -68,22 +78,20 @@ def process_gsm8k(instructions: list, corpus: list, max_samples: int):
                 count += 1
                 instructions.append(f"gsm8k_{count:07d}\tarithmetic\t{q}\t{rat}\t{resp}\t1.0")
                 corpus.append(f"{q} {resp}")
-        print(f"[+] Formatted {count} GSM8K CoT math records.", flush=True)
-    except Exception as e:
-        print(f"[-] Warning GSM8K load failed: {e}", flush=True)
+    print(f"[+] Formatted {count} GSM8K CoT math records.", flush=True)
 
-def process_alpaca(instructions: list, corpus: list, max_samples: int):
-    """Stanford Alpaca (52K rows)."""
-    try:
-        from datasets import load_dataset
-        print("[+] Loading Alpaca instruction dataset...", flush=True)
-        ds = load_dataset("tatsu-lab/alpaca", split="train")
-        count = 0
-        for row in ds:
-            if count >= max_samples: break
-            inst = str(row.get("instruction", "")).strip().replace("\t", " ").replace("\r", "").replace("\n", " ")
-            inp = str(row.get("input", "")).strip().replace("\t", " ").replace("\r", "").replace("\n", " ")
-            out = str(row.get("output", "")).strip().replace("\t", " ").replace("\r", "").replace("\n", " ")
+def process_alpaca(input_file: Path, instructions: list, corpus: list, max_samples: int):
+    """Alpaca (52,002 rows)."""
+    print("[+] Processing Alpaca instruction dataset...", flush=True)
+    count = 0
+    with open(input_file, "r", encoding="utf-8") as f:
+        try: data_list = json.load(f)
+        except Exception: return
+        for data in data_list:
+            if max_samples and count >= max_samples: break
+            inst = str(data.get("instruction", "")).strip().replace("\t", " ").replace("\r", "").replace("\n", " ")
+            inp = str(data.get("input", "")).strip().replace("\t", " ").replace("\r", "").replace("\n", " ")
+            out = str(data.get("output", "")).strip().replace("\t", " ").replace("\r", "").replace("\n", " ")
             prompt = f"{inst} {inp}".strip()
             if not prompt or not out: continue
             count += 1
@@ -91,128 +99,115 @@ def process_alpaca(instructions: list, corpus: list, max_samples: int):
             resp = f"{rat} {out}"
             instructions.append(f"alpaca_{count:07d}\tgeneral\t{prompt}\t{rat}\t{resp}\t1.0")
             corpus.append(f"{prompt} {out}")
-        print(f"[+] Formatted {count} Alpaca instruction records.", flush=True)
-    except Exception as e:
-        print(f"[-] Warning Alpaca load failed: {e}", flush=True)
+    print(f"[+] Formatted {count} Alpaca instruction records.", flush=True)
 
-def process_metamath(instructions: list, corpus: list, max_samples: int):
-    """MetaMathQA step-by-step math reasoning (395K rows)."""
-    try:
-        from datasets import load_dataset
-        print("[+] Loading MetaMathQA CoT math reasoning dataset...", flush=True)
-        ds = load_dataset("meta-math/MetaMathQA", split="train")
-        count = 0
-        for row in ds:
-            if count >= max_samples: break
-            q = str(row.get("query", "")).strip().replace("\t", " ").replace("\r", "").replace("\n", " ")
-            resp_text = str(row.get("response", "")).strip().replace("\t", " ").replace("\r", "").replace("\n", " ")
+def process_metamath(input_file: Path, instructions: list, corpus: list, max_samples: int):
+    """MetaMathQA (395,000 rows)."""
+    print("[+] Processing MetaMathQA step-by-step math reasoning dataset...", flush=True)
+    count = 0
+    with open(input_file, "r", encoding="utf-8") as f:
+        try: data_list = json.load(f)
+        except Exception: return
+        for data in data_list:
+            if max_samples and count >= max_samples: break
+            q = str(data.get("query", "")).strip().replace("\t", " ").replace("\r", "").replace("\n", " ")
+            resp_text = str(data.get("response", "")).strip().replace("\t", " ").replace("\r", "").replace("\n", " ")
             if not q or not resp_text: continue
             count += 1
             rat = "<think> Step 1: Parse mathematical problem. Step 2: Apply step-by-step math rules. </think>"
             resp = f"{rat} {resp_text}"
             instructions.append(f"metamath_{count:07d}\tmath_reasoning\t{q}\t{rat}\t{resp}\t1.0")
             corpus.append(f"{q} {resp_text}")
-        print(f"[+] Formatted {count} MetaMathQA CoT math records.", flush=True)
-    except Exception as e:
-        print(f"[-] Warning MetaMathQA load failed: {e}", flush=True)
+    print(f"[+] Formatted {count} MetaMathQA CoT math records.", flush=True)
 
-def process_wizardlm(instructions: list, corpus: list, max_samples: int):
-    """WizardLM Evol Instruct complex reasoning (70K rows)."""
-    try:
-        from datasets import load_dataset
-        print("[+] Loading WizardLM Evol Instruct dataset...", flush=True)
-        ds = load_dataset("WizardLM/WizardLM_evol_instruct_70k", split="train")
-        count = 0
-        for row in ds:
-            if count >= max_samples: break
-            inst = str(row.get("instruction", "")).strip().replace("\t", " ").replace("\r", "").replace("\n", " ")
-            out = str(row.get("output", "")).strip().replace("\t", " ").replace("\r", "").replace("\n", " ")
-            if not inst or not out: continue
-            count += 1
-            rat = "<think> Step 1: Analyze complex prompt constraints. Step 2: Formulate step-by-step resolution. </think>"
-            resp = f"{rat} {out}"
-            instructions.append(f"wizard_{count:07d}\treasoning\t{inst}\t{rat}\t{resp}\t1.0")
-            corpus.append(f"{inst} {out}")
-        print(f"[+] Formatted {count} WizardLM records.", flush=True)
-    except Exception as e:
-        print(f"[-] Warning WizardLM load failed: {e}", flush=True)
-
-def process_camel_science(instructions: list, corpus: list, max_samples: int):
-    """Camel-AI Science Suite: math, physics, chemistry, biology (110K rows)."""
-    for subject in ["math", "physics", "chemistry", "biology"]:
-        try:
-            from datasets import load_dataset
-            ds_name = f"camel-ai/{subject}"
-            print(f"[+] Loading Camel-AI {subject} reasoning dataset...", flush=True)
-            ds = load_dataset(ds_name, split="train")
-            count = 0
-            for row in ds:
-                if count >= max_samples: break
-                msg_in = str(row.get("message_1", "")).strip().replace("\t", " ").replace("\r", "").replace("\n", " ")
-                msg_out = str(row.get("message_2", "")).strip().replace("\t", " ").replace("\r", "").replace("\n", " ")
-                if not msg_in or not msg_out: continue
-                count += 1
-                rat = f"<think> Step 1: Analyze {subject} problem statement. Step 2: Apply scientific principles. </think>"
-                resp = f"{rat} {msg_out}"
-                instructions.append(f"camel_{subject}_{count:07d}\tscience_{subject}\t{msg_in}\t{rat}\t{resp}\t1.0")
-                corpus.append(f"{msg_in} {msg_out}")
-            print(f"[+] Formatted {count} Camel-AI {subject} records.", flush=True)
-        except Exception as e:
-            print(f"[-] Warning Camel-AI {subject} load failed: {e}", flush=True)
-
-def process_python_code(instructions: list, corpus: list, max_samples: int):
-    """Python Code Instructions (18K rows)."""
-    try:
-        from datasets import load_dataset
-        print("[+] Loading Python Code Instructions dataset...", flush=True)
-        ds = load_dataset("iamtarun/python_code_instructions_18k_alpaca", split="train")
-        count = 0
-        for row in ds:
-            if count >= max_samples: break
-            inst = str(row.get("instruction", "")).strip().replace("\t", " ").replace("\r", "").replace("\n", " ")
-            inp = str(row.get("input", "")).strip().replace("\t", " ").replace("\r", "").replace("\n", " ")
-            out = str(row.get("output", "")).strip().replace("\t", " ").replace("\r", "").replace("\n", " ")
+def process_code_alpaca(input_file: Path, instructions: list, corpus: list, max_samples: int):
+    """CodeAlpaca 20K (20,022 rows)."""
+    print("[+] Processing CodeAlpaca programming dataset...", flush=True)
+    count = 0
+    with open(input_file, "r", encoding="utf-8") as f:
+        try: data_list = json.load(f)
+        except Exception: return
+        for data in data_list:
+            if max_samples and count >= max_samples: break
+            inst = str(data.get("instruction", "")).strip().replace("\t", " ").replace("\r", "").replace("\n", " ")
+            inp = str(data.get("input", "")).strip().replace("\t", " ").replace("\r", "").replace("\n", " ")
+            out = str(data.get("output", "")).strip().replace("\t", " ").replace("\r", "").replace("\n", " ")
             prompt = f"{inst} {inp}".strip()
             if not prompt or not out: continue
             count += 1
-            rat = "<think> Step 1: Understand code problem requirements. Step 2: Implement robust Python algorithm. </think>"
+            rat = "<think> Step 1: Understand code problem requirements. Step 2: Implement robust algorithm. </think>"
             resp = f"{rat} {out}"
             instructions.append(f"code_{count:07d}\tprogramming\t{prompt}\t{rat}\t{resp}\t1.0")
             corpus.append(f"{prompt} {out}")
-        print(f"[+] Formatted {count} Python Code records.", flush=True)
-    except Exception as e:
-        print(f"[-] Warning Python Code load failed: {e}", flush=True)
+    print(f"[+] Formatted {count} CodeAlpaca programming records.", flush=True)
+
+def process_dolly(input_file: Path, instructions: list, corpus: list, max_samples: int):
+    """Databricks Dolly 15K (15,000 rows)."""
+    print("[+] Processing Databricks Dolly 15K dataset...", flush=True)
+    count = 0
+    with open(input_file, "r", encoding="utf-8") as f:
+        for line in f:
+            if max_samples and count >= max_samples: break
+            if not line.strip(): continue
+            try: data = json.loads(line)
+            except Exception: continue
+            inst = str(data.get("instruction", "")).strip().replace("\t", " ").replace("\r", "").replace("\n", " ")
+            ctx = str(data.get("context", "")).strip().replace("\t", " ").replace("\r", "").replace("\n", " ")
+            resp_text = str(data.get("response", "")).strip().replace("\t", " ").replace("\r", "").replace("\n", " ")
+            prompt = f"{inst} {ctx}".strip()
+            if not prompt or not resp_text: continue
+            count += 1
+            rat = "<think> Step 1: Parse context and instruction. Step 2: Formulate clear response. </think>"
+            resp = f"{rat} {resp_text}"
+            instructions.append(f"dolly_{count:07d}\tgeneral\t{prompt}\t{rat}\t{resp}\t1.0")
+            corpus.append(f"{prompt} {resp_text}")
+    print(f"[+] Formatted {count} Dolly 15K records.", flush=True)
 
 def main():
-    load_dotenv()
-    parser = argparse.ArgumentParser(description="RLF Vast.ai 1B Token CoT Dataset Streamer")
+    parser = argparse.ArgumentParser(description="RLF Direct HTTP CoT Dataset Builder")
     parser.add_argument("--output-dir", type=str, default="demo_data/vast_1b", help="Target dataset directory")
     parser.add_argument("--max-samples", type=int, default=2500000, help="Max total samples")
     args = parser.parse_args()
 
     out_dir = Path(args.output_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
+    cache_dir = out_dir / "cache"
+    cache_dir.mkdir(exist_ok=True)
 
-    print("=========================================================================")
-    print("  RLF Vast.ai Frontier 24G — 1-Billion Token Multi-Dataset Streamer      ")
-    print("=========================================================================")
+    print("=========================================================================", flush=True)
+    print("  RLF Direct HTTP CoT Dataset Builder (No HF Middleware Dependencies)    ", flush=True)
+    print("=========================================================================", flush=True)
 
-    ensure_datasets_installed()
+    gsm8k_url = "https://raw.githubusercontent.com/openai/grade-school-math/master/grade_school_math/data/train.jsonl"
+    alpaca_url = "https://raw.githubusercontent.com/tatsu-lab/stanford_alpaca/main/alpaca_data.json"
+    code_alpaca_url = "https://raw.githubusercontent.com/sahil280114/codealpaca/master/data/code_alpaca_20k.json"
+    dolly_url = "https://raw.githubusercontent.com/databrickslabs/dolly/master/data/databricks-dolly-15k.jsonl"
+    metamath_url = "https://huggingface.co/datasets/meta-math/MetaMathQA/resolve/main/MetaMathQA-395K.json"
+
+    gsm8k_path = cache_dir / "gsm8k_train.jsonl"
+    alpaca_path = cache_dir / "alpaca_data.json"
+    code_alpaca_path = cache_dir / "code_alpaca_20k.json"
+    dolly_path = cache_dir / "dolly_15k.jsonl"
+    metamath_path = cache_dir / "MetaMathQA-395K.json"
+
+    download_raw_file(gsm8k_url, gsm8k_path)
+    download_raw_file(alpaca_url, alpaca_path)
+    download_raw_file(code_alpaca_url, code_alpaca_path)
+    download_raw_file(dolly_url, dolly_path)
+    download_raw_file(metamath_url, metamath_path)
 
     instructions = ["# task\tdomain\tprompt\trationale\tresponse\tquality"]
     corpus = []
 
-    # Stream across 7 open dataset pillars
-    process_gsm8k(instructions, corpus, 10000)
-    process_alpaca(instructions, corpus, 60000)
-    process_metamath(instructions, corpus, 400000)
-    process_wizardlm(instructions, corpus, 70000)
-    process_camel_science(instructions, corpus, 30000)
-    process_python_code(instructions, corpus, 30000)
+    if gsm8k_path.exists(): process_gsm8k(gsm8k_path, instructions, corpus, args.max_samples)
+    if alpaca_path.exists(): process_alpaca(alpaca_path, instructions, corpus, args.max_samples)
+    if code_alpaca_path.exists(): process_code_alpaca(code_alpaca_path, instructions, corpus, args.max_samples)
+    if dolly_path.exists(): process_dolly(dolly_path, instructions, corpus, args.max_samples)
+    if metamath_path.exists(): process_metamath(metamath_path, instructions, corpus, args.max_samples)
 
     total_rows = len(instructions) - 1
     if total_rows == 0:
-        print("[-] FATAL: No dataset rows built. Aborting.")
+        print("[-] FATAL: No dataset rows built. Aborting.", flush=True)
         sys.exit(1)
 
     instructions_file = out_dir / "instructions.tsv"
@@ -224,11 +219,11 @@ def main():
     with open(corpus_file, "w", encoding="utf-8") as f:
         f.write("\n".join(corpus) + "\n")
 
-    print(f"\n=======================================================")
-    print(f"[+] Successfully built 1-Billion Token Dataset Suite:")
-    print(f"    total_instruction_rows = {total_rows}")
-    print(f"    total_corpus_lines     = {len(corpus)}")
-    print(f"=======================================================")
+    print(f"\n=======================================================", flush=True)
+    print(f"[+] Successfully built Direct CoT Dataset Suite:", flush=True)
+    print(f"    total_instruction_rows = {total_rows}", flush=True)
+    print(f"    total_corpus_lines     = {len(corpus)}", flush=True)
+    print(f"=======================================================", flush=True)
 
 if __name__ == "__main__":
     main()
