@@ -105,19 +105,27 @@ def process_metamath(input_file: Path, instructions: list, corpus: list, max_sam
     """MetaMathQA (395,000 rows)."""
     print("[+] Processing MetaMathQA step-by-step math reasoning dataset...", flush=True)
     count = 0
+    data_list = []
     with open(input_file, "r", encoding="utf-8") as f:
-        try: data_list = json.load(f)
-        except Exception: return
-        for data in data_list:
-            if max_samples and count >= max_samples: break
-            q = str(data.get("query", "")).strip().replace("\t", " ").replace("\r", "").replace("\n", " ")
-            resp_text = str(data.get("response", "")).strip().replace("\t", " ").replace("\r", "").replace("\n", " ")
-            if not q or not resp_text: continue
-            count += 1
-            rat = "<think> Step 1: Parse mathematical problem. Step 2: Apply step-by-step math rules. </think>"
-            resp = f"{rat} {resp_text}"
-            instructions.append(f"metamath_{count:07d}\tmath_reasoning\t{q}\t{rat}\t{resp}\t1.0")
-            corpus.append(f"{q} {resp_text}")
+        try:
+            data_list = json.load(f)
+        except Exception:
+            f.seek(0)
+            for line in f:
+                if line.strip():
+                    try: data_list.append(json.loads(line))
+                    except Exception: continue
+
+    for data in data_list:
+        if max_samples and count >= max_samples: break
+        q = str(data.get("query", data.get("question", ""))).strip().replace("\t", " ").replace("\r", "").replace("\n", " ")
+        resp_text = str(data.get("response", data.get("answer", ""))).strip().replace("\t", " ").replace("\r", "").replace("\n", " ")
+        if not q or not resp_text: continue
+        count += 1
+        rat = "<think> Step 1: Parse mathematical problem. Step 2: Apply step-by-step math rules. </think>"
+        resp = f"{rat} {resp_text}"
+        instructions.append(f"metamath_{count:07d}\tmath_reasoning\t{q}\t{rat}\t{resp}\t1.0")
+        corpus.append(f"{q} {resp_text}")
     print(f"[+] Formatted {count} MetaMathQA CoT math records.", flush=True)
 
 def process_code_alpaca(input_file: Path, instructions: list, corpus: list, max_samples: int):
