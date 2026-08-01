@@ -1,17 +1,18 @@
 #!/usr/bin/env python3
 """
-RLF 1.0 Billion Token Multi-Modal Master Dataset Builder
-=========================================================
+RLF 1.0 Billion Token Multi-Modal Master Dataset Builder (With Native Tool Calling)
+=====================================================================================
 Builds the complete 1.0 Billion Token Multi-Modal Master Suite across:
-1. 🛡️ CyberSecurity (SecOps, CVE, SmartContract Audit)
-2. 📈 Finance & Quant Analysis (FinQA, Options Pricing CoT, SEC Filings)
-3. 🔬 Academic Research & Science (ArXiv-CoT, SciQ, PubMed-CoT)
-4. 💻 Software Engineering & SWE-Bench (SWE-Bench Verified, MagicCoder, CodeAlpaca)
-5. 🌐 Full-Stack Web Dev & Advanced Frontend (Next.js 15, React, Tailwind, UI-to-Code)
-6. ⚖️ Law & Legal Reasoning (CUAD Contracts, LegalBench, CaseHold)
-7. 🌍 English & Multilingual Fluency (SlimOrca Multilingual, UltraChat)
-8. 👁️ Multi-Modal Vision & Doc QA (LLaVA-150K, DocVQA, ChartQA)
-9. 📁 Custom User Dataset (C:\\Users\\GC121\\Documents\\coding\\01_organized.jsonl)
+1. 🛠️ Tool Calling & Autonomous Agent Operations (Function calling, JSON schema, bash/python/file_io ops)
+2. 🛡️ CyberSecurity (SecOps, CVE, SmartContract Audit)
+3. 📈 Finance & Quant Analysis (FinQA, Options Pricing CoT, SEC Filings)
+4. 🔬 Academic Research & Science (ArXiv-CoT, SciQ, PubMed-CoT)
+5. 💻 Software Engineering & SWE-Bench (SWE-Bench Verified, MagicCoder, CodeAlpaca)
+6. 🌐 Full-Stack Web Dev & Advanced Frontend (Next.js 15, React, Tailwind, UI-to-Code)
+7. ⚖️ Law & Legal Reasoning (CUAD Contracts, LegalBench, CaseHold)
+8. 🌍 English & Multilingual Fluency (SlimOrca Multilingual, UltraChat)
+9. 👁️ Multi-Modal Vision & Doc QA (LLaVA-150K, DocVQA, ChartQA)
+10. 📁 Custom User Dataset (C:\\Users\\GC121\\Documents\\coding\\01_organized.jsonl)
 
 Usage:
   python3 scripts/download_and_build_1b_multimodal_master.py
@@ -86,9 +87,19 @@ def download_file(url: str, dest_path: Path):
         return False
 
 def generate_domain_templates():
-    """Generates synthetic high-quality seed CoT records for specialized domains if raw datasets offline."""
+    """Generates synthetic high-quality seed CoT and Tool-Calling records."""
     domain_seeds = []
     
+    # 0. Tool Calling & Autonomous Agent Operations
+    tool_samples = [
+        ("tool_0000001", "tool_calling", "Create a React component file at app/components/Button.tsx and build the project",
+         "<think> Step 1: Call write_file to save Button.tsx. Step 2: Call run_command to run npm run build. </think>",
+         "TOOL_CALL: write_file {\"path\": \"app/components/Button.tsx\", \"content\": \"export default function Button() { return <button className=\\\"px-4 py-2 bg-indigo-600 text-white rounded-lg\\\">Click</button>; }\"}\nTOOL_CALL: run_command {\"command\": \"npm run build\"}\nRESULT: Built successfully with 0 errors."),
+        ("tool_0000002", "tool_calling", "Search web for latest Next.js 15 Server Actions documentation and summarize",
+         "<think> Step 1: Use web_search to fetch Next.js 15 Server Actions documentation. Step 2: Summarize async action patterns. </think>",
+         "TOOL_CALL: web_search {\"query\": \"Next.js 15 Server Actions documentation\"}\nRESULT: Server Actions are asynchronous functions executed on the server. They can be called in Client and Server Components to handle data mutations.")
+    ]
+
     # 1. CyberSecurity
     cybersec_samples = [
         ("sec_0000001", "cybersecurity", "Audit C++ buffer overflow vulnerability and write secure fix",
@@ -139,7 +150,7 @@ def generate_domain_templates():
          "export default function Pricing() { return (<section className=\"py-20 bg-slate-950 text-white\"><div className=\"max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 p-6\"><div className=\"p-8 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10\"><h3>Basic</h3><p>$9/mo</p></div><div className=\"p-8 rounded-2xl bg-indigo-600/20 backdrop-blur-lg border-2 border-indigo-500 transform scale-105\"><h3>Pro</h3><p>$29/mo</p></div><div className=\"p-8 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10\"><h3>Enterprise</h3><p>$99/mo</p></div></div></section>); }")
     ]
 
-    for category in [cybersec_samples, finance_samples, research_samples, legal_samples, webdev_samples]:
+    for category in [tool_samples, cybersec_samples, finance_samples, research_samples, legal_samples, webdev_samples]:
         for item in category:
             domain_seeds.append({
                 "id": item[0],
@@ -152,7 +163,7 @@ def generate_domain_templates():
 
 def main():
     print("=========================================================================", flush=True)
-    print("  RLF 1.0 Billion Token Multi-Modal Master Dataset Builder              ", flush=True)
+    print("  RLF 1.0B Multi-Modal Master Builder (With Native Tool Calling)         ", flush=True)
     print("=========================================================================", flush=True)
 
     # 1. Download base open datasets
@@ -270,7 +281,7 @@ def main():
                 except Exception: pass
         print(f"[+] Merged {count:,} User Custom Records.", flush=True)
 
-    # 7. Merge Synthetic Multi-Domain Seeds
+    # 7. Merge Synthetic Multi-Domain & Tool Calling Seeds
     seeds = generate_domain_templates()
     for s in seeds:
         think_block = f"<think> {s['rationale']} </think>" if not s['rationale'].startswith("<think>") else s['rationale']
@@ -289,7 +300,7 @@ def main():
         f.write("\n".join(instruction_rows) + "\n")
 
     print("\n=======================================================", flush=True)
-    print(f"[+] Successfully built 1.0B Multi-Modal Master Suite:", flush=True)
+    print(f"[+] Successfully built 1.0B Multi-Modal Master Suite (With Native Tool Calling):", flush=True)
     print(f"    Total Instruction Rows:  {len(instruction_rows):,}", flush=True)
     print(f"    Total Corpus Lines:       {len(corpus_lines):,}", flush=True)
     print(f"    Corpus File Path:         {corpus_out}", flush=True)
