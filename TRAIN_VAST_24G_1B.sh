@@ -61,14 +61,31 @@ fi
 
 echo "[+] Using Solstice executable: ${EXECUTABLE}"
 
-# 5. Download and stream 1B Token CoT dataset from HF
-echo "[+] Fetching and processing 1-Billion Token CoT reasoning dataset..."
+# 5. Download and stream CoT dataset from HF
+echo "[+] Fetching and processing CoT reasoning dataset from Hugging Face..."
 python3 "${ROOT_DIR}/scripts/download_and_build_1b_cot_dataset.py" --output-dir "${DATA_DIR}" --max-samples 2500000
+if [ $? -ne 0 ]; then
+    echo "[-] Error: Dataset download failed!"
+    exit 1
+fi
+
+# Verify data files exist and are non-empty
+if [ ! -s "${DATA_DIR}/corpus.txt" ]; then
+    echo "[-] Error: corpus.txt is empty or missing!"
+    exit 1
+fi
+if [ ! -s "${DATA_DIR}/instructions.tsv" ]; then
+    echo "[-] Error: instructions.tsv is empty or missing!"
+    exit 1
+fi
+
+echo "[+] Dataset files verified:"
+wc -l "${DATA_DIR}/corpus.txt" "${DATA_DIR}/instructions.tsv"
 
 mkdir -p "$(dirname "${CHECKPOINT}")"
 
 echo "========================================================================="
-echo " Starting 1-Billion Token CUDA Training Pass on 24GB Vast.ai GPU        "
+echo " Starting CUDA Training Pass on 24GB Vast.ai GPU                        "
 echo "========================================================================="
 
 "${EXECUTABLE}" train-text \
@@ -86,7 +103,7 @@ echo "========================================================================="
     --enforce-profile \
     --manifest "${DATA_DIR}/instructions.tsv"
 
-"${EXECUTABLE}" verify \
+"${EXECUTABLE}" verify-checkpoint \
     --checkpoint "${CHECKPOINT}" \
     --profile frontier-24g \
     --backend "${BACKEND}" \
@@ -94,7 +111,8 @@ echo "========================================================================="
 
 echo ""
 echo "========================================================================="
-echo " 1-Billion Token Vast.ai Campaign Complete!                              "
+echo " Vast.ai Campaign Complete!                                              "
 echo " Master Checkpoint: ${CHECKPOINT}                                       "
 echo " Launch Chat: ./CHAT_VAST_24G.sh                                         "
 echo "========================================================================="
+
