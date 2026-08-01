@@ -68,15 +68,15 @@ def process_gsm8k(instructions: list, corpus: list, max_samples: int):
                 count += 1
                 instructions.append(f"gsm8k_{count:07d}\tarithmetic\t{q}\t{rat}\t{resp}\t1.0")
                 corpus.append(f"{q} {resp}")
-        print(f"[+] Formatted {count} GSM8K CoT math records.")
+        print(f"[+] Formatted {count} GSM8K CoT math records.", flush=True)
     except Exception as e:
-        print(f"[-] Warning GSM8K load failed: {e}")
+        print(f"[-] Warning GSM8K load failed: {e}", flush=True)
 
 def process_alpaca(instructions: list, corpus: list, max_samples: int):
     """Stanford Alpaca (52K rows)."""
     try:
         from datasets import load_dataset
-        print("[+] Loading Alpaca instruction dataset...")
+        print("[+] Loading Alpaca instruction dataset...", flush=True)
         ds = load_dataset("tatsu-lab/alpaca", split="train")
         count = 0
         for row in ds:
@@ -91,15 +91,15 @@ def process_alpaca(instructions: list, corpus: list, max_samples: int):
             resp = f"{rat} {out}"
             instructions.append(f"alpaca_{count:07d}\tgeneral\t{prompt}\t{rat}\t{resp}\t1.0")
             corpus.append(f"{prompt} {out}")
-        print(f"[+] Formatted {count} Alpaca instruction records.")
+        print(f"[+] Formatted {count} Alpaca instruction records.", flush=True)
     except Exception as e:
-        print(f"[-] Warning Alpaca load failed: {e}")
+        print(f"[-] Warning Alpaca load failed: {e}", flush=True)
 
 def process_metamath(instructions: list, corpus: list, max_samples: int):
     """MetaMathQA step-by-step math reasoning (395K rows)."""
     try:
         from datasets import load_dataset
-        print("[+] Loading MetaMathQA CoT math reasoning dataset...")
+        print("[+] Loading MetaMathQA CoT math reasoning dataset...", flush=True)
         ds = load_dataset("meta-math/MetaMathQA", split="train")
         count = 0
         for row in ds:
@@ -112,15 +112,15 @@ def process_metamath(instructions: list, corpus: list, max_samples: int):
             resp = f"{rat} {resp_text}"
             instructions.append(f"metamath_{count:07d}\tmath_reasoning\t{q}\t{rat}\t{resp}\t1.0")
             corpus.append(f"{q} {resp_text}")
-        print(f"[+] Formatted {count} MetaMathQA CoT math records.")
+        print(f"[+] Formatted {count} MetaMathQA CoT math records.", flush=True)
     except Exception as e:
-        print(f"[-] Warning MetaMathQA load failed: {e}")
+        print(f"[-] Warning MetaMathQA load failed: {e}", flush=True)
 
 def process_wizardlm(instructions: list, corpus: list, max_samples: int):
     """WizardLM Evol Instruct complex reasoning (70K rows)."""
     try:
         from datasets import load_dataset
-        print("[+] Loading WizardLM Evol Instruct dataset...")
+        print("[+] Loading WizardLM Evol Instruct dataset...", flush=True)
         ds = load_dataset("WizardLM/WizardLM_evol_instruct_70k", split="train")
         count = 0
         for row in ds:
@@ -133,9 +133,9 @@ def process_wizardlm(instructions: list, corpus: list, max_samples: int):
             resp = f"{rat} {out}"
             instructions.append(f"wizard_{count:07d}\treasoning\t{inst}\t{rat}\t{resp}\t1.0")
             corpus.append(f"{inst} {out}")
-        print(f"[+] Formatted {count} WizardLM records.")
+        print(f"[+] Formatted {count} WizardLM records.", flush=True)
     except Exception as e:
-        print(f"[-] Warning WizardLM load failed: {e}")
+        print(f"[-] Warning WizardLM load failed: {e}", flush=True)
 
 def process_camel_science(instructions: list, corpus: list, max_samples: int):
     """Camel-AI Science Suite: math, physics, chemistry, biology (110K rows)."""
@@ -143,7 +143,7 @@ def process_camel_science(instructions: list, corpus: list, max_samples: int):
         try:
             from datasets import load_dataset
             ds_name = f"camel-ai/{subject}"
-            print(f"[+] Loading Camel-AI {subject} reasoning dataset...")
+            print(f"[+] Loading Camel-AI {subject} reasoning dataset...", flush=True)
             ds = load_dataset(ds_name, split="train")
             count = 0
             for row in ds:
@@ -156,15 +156,15 @@ def process_camel_science(instructions: list, corpus: list, max_samples: int):
                 resp = f"{rat} {msg_out}"
                 instructions.append(f"camel_{subject}_{count:07d}\tscience_{subject}\t{msg_in}\t{rat}\t{resp}\t1.0")
                 corpus.append(f"{msg_in} {msg_out}")
-            print(f"[+] Formatted {count} Camel-AI {subject} records.")
+            print(f"[+] Formatted {count} Camel-AI {subject} records.", flush=True)
         except Exception as e:
-            print(f"[-] Warning Camel-AI {subject} load failed: {e}")
+            print(f"[-] Warning Camel-AI {subject} load failed: {e}", flush=True)
 
 def process_python_code(instructions: list, corpus: list, max_samples: int):
     """Python Code Instructions (18K rows)."""
     try:
         from datasets import load_dataset
-        print("[+] Loading Python Code Instructions dataset...")
+        print("[+] Loading Python Code Instructions dataset...", flush=True)
         ds = load_dataset("iamtarun/python_code_instructions_18k_alpaca", split="train")
         count = 0
         for row in ds:
@@ -179,9 +179,9 @@ def process_python_code(instructions: list, corpus: list, max_samples: int):
             resp = f"{rat} {out}"
             instructions.append(f"code_{count:07d}\tprogramming\t{prompt}\t{rat}\t{resp}\t1.0")
             corpus.append(f"{prompt} {out}")
-        print(f"[+] Formatted {count} Python Code records.")
+        print(f"[+] Formatted {count} Python Code records.", flush=True)
     except Exception as e:
-        print(f"[-] Warning Python Code load failed: {e}")
+        print(f"[-] Warning Python Code load failed: {e}", flush=True)
 
 def main():
     load_dotenv()
