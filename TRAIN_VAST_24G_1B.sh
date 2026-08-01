@@ -49,7 +49,7 @@ if [ ! -f "${EXECUTABLE}" ]; then
     echo "[+] Building Solstice CUDA release executable for Vast.ai..."
     mkdir -p "${ROOT_DIR}/build/3090-release"
     cd "${ROOT_DIR}"
-    cmake -B build/3090-release -S . -DCMAKE_BUILD_TYPE=Release -DRLF_ENABLE_CUDA=ON -DCMAKE_CUDA_ARCHITECTURES="80;86;89;90"
+    cmake -B build/3090-release -S . -DCMAKE_BUILD_TYPE=Release -DRLF_ENABLE_CUDA=ON -DCMAKE_CUDA_ARCHITECTURES="80;86;89;90" -DRLF_WARNINGS_AS_ERRORS=OFF
     cmake --build build/3090-release -j"$(nproc)"
     EXECUTABLE="${ROOT_DIR}/build/3090-release/solstice"
 fi
