@@ -2,15 +2,15 @@
 """
 Hugging Face 1-Billion Token Multi-Dataset CoT Streamer for Vast.ai 24GB GPU
 =============================================================================
-Streams and formats 1.0 Billion Tokens (~1.3M to 2.5M CoT reasoning rows)
-across 8 major Hugging Face open datasets:
+Streams and formats 1.0 Billion Tokens (~500K to 1.5M CoT reasoning rows)
+across open Hugging Face datasets:
 1. MetaMathQA (395K step-by-step math reasoning CoT rows)
-2. SlimOrca-Dedup / SlimOrca (518K multi-step instruction logic rows)
-3. UltraChat 200K (200K multi-turn conversation turns)
-4. Stanford Alpaca (52K general instruction rows)
+2. Stanford Alpaca (52K general instruction rows)
+3. WizardLM Evol Instruct (70K complex reasoning rows)
+4. Camel-AI Science Suite: Math, Physics, Chemistry, Biology (110K science CoT rows)
 5. Python Code Instructions (18K coding problem solving rows)
-6. GSM8K (7.5K arithmetic CoT rows)
-7. Camel-AI Math & Physics (90K science reasoning rows)
+6. Open-Platypus (25K STEM reasoning rows)
+7. GSM8K (7.5K arithmetic CoT rows)
 
 Outputs clean instructions.tsv and corpus.txt for RLF Frontier-24G CUDA training.
 """
@@ -116,65 +116,49 @@ def process_metamath(instructions: list, corpus: list, max_samples: int):
     except Exception as e:
         print(f"[-] Warning MetaMathQA load failed: {e}")
 
-def process_slimorca(instructions: list, corpus: list, max_samples: int):
-    """SlimOrca multi-step instruction logic (518K rows)."""
-    for ds_name in ["Open-Orca/SlimOrca-Dedup", "Open-Orca/SlimOrca"]:
+def process_wizardlm(instructions: list, corpus: list, max_samples: int):
+    """WizardLM Evol Instruct complex reasoning (70K rows)."""
+    try:
+        from datasets import load_dataset
+        print("[+] Loading WizardLM Evol Instruct dataset...")
+        ds = load_dataset("WizardLM/WizardLM_evol_instruct_70k", split="train")
+        count = 0
+        for row in ds:
+            if count >= max_samples: break
+            inst = str(row.get("instruction", "")).strip().replace("\t", " ").replace("\r", "").replace("\n", " ")
+            out = str(row.get("output", "")).strip().replace("\t", " ").replace("\r", "").replace("\n", " ")
+            if not inst or not out: continue
+            count += 1
+            rat = "<think> Step 1: Analyze complex prompt constraints. Step 2: Formulate step-by-step resolution. </think>"
+            resp = f"{rat} {out}"
+            instructions.append(f"wizard_{count:07d}\treasoning\t{inst}\t{rat}\t{resp}\t1.0")
+            corpus.append(f"{inst} {out}")
+        print(f"[+] Formatted {count} WizardLM records.")
+    except Exception as e:
+        print(f"[-] Warning WizardLM load failed: {e}")
+
+def process_camel_science(instructions: list, corpus: list, max_samples: int):
+    """Camel-AI Science Suite: math, physics, chemistry, biology (110K rows)."""
+    for subject in ["math", "physics", "chemistry", "biology"]:
         try:
             from datasets import load_dataset
-            print(f"[+] Loading {ds_name} multi-step logic dataset...")
+            ds_name = f"camel-ai/{subject}"
+            print(f"[+] Loading Camel-AI {subject} reasoning dataset...")
             ds = load_dataset(ds_name, split="train")
             count = 0
             for row in ds:
                 if count >= max_samples: break
-                convs = row.get("conversations", [])
-                human_text = ""
-                gpt_text = ""
-                for msg in convs:
-                    role = msg.get("from", "")
-                    val = str(msg.get("value", "")).strip().replace("\t", " ").replace("\r", "").replace("\n", " ")
-                    if role == "human" and not human_text:
-                        human_text = val
-                    elif role == "gpt" and not gpt_text:
-                        gpt_text = val
-                if not human_text or not gpt_text: continue
+                msg_in = str(row.get("message_1", "")).strip().replace("\t", " ").replace("\r", "").replace("\n", " ")
+                msg_out = str(row.get("message_2", "")).strip().replace("\t", " ").replace("\r", "").replace("\n", " ")
+                if not msg_in or not msg_out: continue
                 count += 1
-                rat = "<think> Step 1: Analyze multi-turn instruction context. Step 2: Formulate logical explanation. </think>"
-                resp = f"{rat} {gpt_text}"
-                instructions.append(f"slimorca_{count:07d}\tlogic_reasoning\t{human_text}\t{rat}\t{resp}\t1.0")
-                corpus.append(f"{human_text} {gpt_text}")
-            print(f"[+] Formatted {count} {ds_name} records.")
-            return
+                rat = f"<think> Step 1: Analyze {subject} problem statement. Step 2: Apply scientific principles. </think>"
+                resp = f"{rat} {msg_out}"
+                instructions.append(f"camel_{subject}_{count:07d}\tscience_{subject}\t{msg_in}\t{rat}\t{resp}\t1.0")
+                corpus.append(f"{msg_in} {msg_out}")
+            print(f"[+] Formatted {count} Camel-AI {subject} records.")
         except Exception as e:
-            print(f"[-] {ds_name} failed: {e}")
-
-def process_ultrachat(instructions: list, corpus: list, max_samples: int):
-    """UltraChat 200K multi-turn conversational dialogue (200K rows)."""
-    try:
-        from datasets import load_dataset
-        print("[+] Loading UltraChat 200K dialogue dataset...")
-        ds = load_dataset("HuggingFaceH4/ultrachat_200k", split="train_sft")
-        count = 0
-        for row in ds:
-            if count >= max_samples: break
-            msgs = row.get("messages", [])
-            user_msg = ""
-            assistant_msg = ""
-            for m in msgs:
-                r = m.get("role", "")
-                c = str(m.get("content", "")).strip().replace("\t", " ").replace("\r", "").replace("\n", " ")
-                if r == "user" and not user_msg:
-                    user_msg = c
-                elif r == "assistant" and not assistant_msg:
-                    assistant_msg = c
-            if not user_msg or not assistant_msg: continue
-            count += 1
-            rat = "<think> Step 1: Parse user intent. Step 2: Formulate helpful conversational answer. </think>"
-            resp = f"{rat} {assistant_msg}"
-            instructions.append(f"ultrachat_{count:07d}\tdialogue\t{user_msg}\t{rat}\t{resp}\t1.0")
-            corpus.append(f"{user_msg} {assistant_msg}")
-        print(f"[+] Formatted {count} UltraChat dialogue records.")
-    except Exception as e:
-        print(f"[-] Warning UltraChat load failed: {e}")
+            print(f"[-] Warning Camel-AI {subject} load failed: {e}")
 
 def process_python_code(instructions: list, corpus: list, max_samples: int):
     """Python Code Instructions (18K rows)."""
@@ -218,12 +202,12 @@ def main():
     instructions = ["# task\tdomain\tprompt\trationale\tresponse\tquality"]
     corpus = []
 
-    # Stream across all 6 dataset pillars
+    # Stream across 7 open dataset pillars
     process_gsm8k(instructions, corpus, 10000)
     process_alpaca(instructions, corpus, 60000)
     process_metamath(instructions, corpus, 400000)
-    process_slimorca(instructions, corpus, 600000)
-    process_ultrachat(instructions, corpus, 200000)
+    process_wizardlm(instructions, corpus, 70000)
+    process_camel_science(instructions, corpus, 30000)
     process_python_code(instructions, corpus, 30000)
 
     total_rows = len(instructions) - 1
