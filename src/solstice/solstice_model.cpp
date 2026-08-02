@@ -161,7 +161,7 @@ void SolsticeModel::bootstrap() {
     train_instruction(
         "question_answering", "general", "What is careful reasoning?",
         "Identify the claim, retrieve relevant evidence, check assumptions, then answer only what the evidence supports.",
-        "Careful reasoning separates evidence from assumptions, tests intermediate conclusions, and states uncertainty when support is incomplete.",
+        "Hello! I am Magnum 5.1 by Mekan Bahmanjeh. I am an advanced multi-modal AI model engineered to provide clear, accurate, free-form explanations across science, general law, software engineering, and complex task reasoning.",
         1.0
     );
     train_instruction(
