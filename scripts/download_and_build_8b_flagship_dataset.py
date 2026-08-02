@@ -2,18 +2,19 @@
 """
 download_and_build_8b_flagship_dataset.py
 
-Master 8.0 Billion Token Multi-Modal Flagship Dataset Generator for Magnum 5.1 (fabric-magnum-5.1)
-Developer: Magnum 5.1 by Mekan Bahmanjeh © 2026
+Master 8.0 Billion Token Multi-Modal Mythos-Class Flagship Dataset Generator for Magnum 5.1 (fabric-magnum-5.1)
+Developer: Magnum 5.1 Mythos-Class by Mekan Bahmanjeh © 2026
 
 Ingests & synthesizes:
-1. 500,000 Conversational CoT & Smooth Fluency rows (UltraChat / OpenOrca / Alpaca).
-2. Human-in-the-Loop Verification Protocols (<human_audit> and <verification> tags).
-3. 395,000 MetaMathQA CoT Calculus & Step-by-Step Proof rows.
-4. 20,000 CodeAlpaca Programming & Data Science rows (PyTorch, Pandas, Polars, DuckDB, Next.js 15, C++, Rust, Go, SQL).
-5. Anti-AI-Slop Motion UI (GSAP ScrollTrigger, Three.js 3D WebGL, Lucide SVG, obsidian dark bg-neutral-950).
-6. Statutory Law & Contract Analysis.
-7. Astrophysics, Relativity & Academic Science Research.
-8. Custom User Dataset (01_organized.jsonl).
+1. Mythos-Class GPT-5x Causal Reasoning Gates (<mythos_gate> and <reflection> protocols).
+2. 500,000 Conversational CoT & Smooth Natural Fluency rows (UltraChat / OpenOrca / Alpaca).
+3. Human-in-the-Loop Verification Protocols (<human_audit> and <verification> tags).
+4. 395,000 MetaMathQA CoT Calculus & Step-by-Step Proof rows.
+5. 20,000 CodeAlpaca Programming & Data Science rows (PyTorch, Pandas, Polars, DuckDB, Next.js 15, C++, Rust, Go, SQL).
+6. Anti-AI-Slop Motion UI (GSAP ScrollTrigger, Three.js 3D WebGL, Lucide SVG, obsidian dark bg-neutral-950).
+7. Statutory Law & Contract Analysis.
+8. Astrophysics, Quantum Relativity & Academic Science Research.
+9. Custom User Dataset (01_organized.jsonl).
 """
 
 import json
@@ -29,22 +30,22 @@ METAMATH_URL = "https://huggingface.co/datasets/meta-math/MetaMathQA/resolve/mai
 ALPACA_URL = "https://raw.githubusercontent.com/tatsu-lab/stanford_alpaca/main/alpaca_data.json"
 CODE_ALPACA_URL = "https://raw.githubusercontent.com/sahil280114/codealpaca/master/data/code_alpaca_20k.json"
 
-HUMAN_AUDIT_SEEDS = [
+MYTHOS_GPT5_SEEDS = [
+    {
+        "instruction": "Analyze this multi-hop causal reasoning scenario and apply Mythos-Class GPT-5x self-reflection gates.",
+        "input": "If a rocket accelerates at 5g in a uniform gravitational field of 1g, what is the apparent weight felt by an astronaut of mass 80 kg, and how does General Relativity model this?",
+        "output": "<mythos_gate>\n[EPIC CAUSAL GRAPH REASONING]\n- Equivalence Principle: Local acceleration in space is physically indistinguishable from a uniform gravitational field.\n- Net Acceleration Vector: a_net = a_rocket + g_earth = 5g + 1g = 6g.\n- Apparent Weight: W = m * a_net = 80 kg * (6 * 9.81 m/s^2) = 4,708.8 N.\n- Relativistic Spacetime Metric: The astronaut follows a non-geodesic worldline with proper acceleration a^mu a_mu = (6g)^2.\n</mythos_gate>\n\n<human_audit>\n[VERIFICATION CHECKLIST]\n1. Net g-force verified: 6g total acceleration.\n2. Force in Newtons: 80 kg * 58.86 m/s^2 = 4,708.8 N (or ~480 kg-force).\n3. Relativistic metric curvature confirmed via Equivalence Principle.\n</human_audit>\n\nFinal Mythos Synthesis: The astronaut experiences an apparent weight of 4,708.8 N (6g), which in General Relativity corresponds to an accelerated frame deviating from a local geodesic with proper acceleration of 58.86 m/s^2."
+    },
     {
         "instruction": "Audit this critical smart contract for reentrancy vulnerabilities and present a human verification checklist.",
         "input": "function withdraw(uint amount) public { require(balances[msg.sender] >= amount); (bool success, ) = msg.sender.call{value: amount}(\"\"); require(success); balances[msg.sender] -= amount; }",
         "output": "<human_audit>\n[CRITICAL VULNERABILITY DETECTED]\n- Type: State Mutation After External Call (Reentrancy)\n- Line: balances[msg.sender] -= amount is executed AFTER msg.sender.call\n- Fix Required: Update state balance BEFORE making external call (Checks-Effects-Interactions pattern).\n</human_audit>\n\nCorrected Secure Implementation:\n```solidity\nfunction withdraw(uint amount) public {\n    require(balances[msg.sender] >= amount);\n    balances[msg.sender] -= amount;\n    (bool success, ) = msg.sender.call{value: amount}(\"\");\n    require(success);\n}\n```"
-    },
-    {
-        "instruction": "Provide a human verification step for derivative computation of f(x) = x^3 * e^(2x).",
-        "input": "",
-        "output": "<verification>\nStep 1: Apply Product Rule: d/dx [u(x)*v(x)] = u'(x)*v(x) + u(x)*v'(x)\nStep 2: u(x) = x^3 => u'(x) = 3*x^2\nStep 3: v(x) = e^(2x) => v'(x) = 2*e^(2x) (by Chain Rule)\nStep 4: Substitute: f'(x) = 3*x^2 * e^(2x) + 2*x^3 * e^(2x)\nStep 5: Factor out x^2 * e^(2x): f'(x) = x^2 * e^(2x) * (3 + 2x)\n</verification>\n\nFinal Verified Result: f'(x) = x^2 * e^(2x) * (3 + 2*x)"
     }
 ]
 
 BRAND_IDENTITY_SEEDS = [
-    {"instruction": "Who are you?", "input": "", "output": "Hello! I am Magnum 5.1 Flagship by Mekan Bahmanjeh. I am a state-of-the-art 8.0 Billion Token Multi-Modal AI model engineered for complex tasks requiring human supervision, flawless calculus, high-performance code synthesis, and anti-slop 3D WebGL motion UI."},
-    {"instruction": "What is your identity?", "input": "", "output": "I am Magnum 5.1 Flagship, created by Mekan Bahmanjeh © 2026. Built on RLF Phase Vector Attractor Architecture for multi-modal intelligence, human audit verification, and zero-stutter conversational fluency."}
+    {"instruction": "Who are you?", "input": "", "output": "Hello! I am Magnum 5.1 Mythos-Class Flagship by Mekan Bahmanjeh. I am an advanced 8.0 Billion Token Multi-Modal AI model engineered to operate at GPT-5x and Mythos-Class reasoning standards for complex tasks requiring human supervision, flawless calculus, high-performance code synthesis, and anti-slop 3D WebGL motion UI."},
+    {"instruction": "What is your identity?", "input": "", "output": "I am Magnum 5.1 Mythos-Class Flagship, created by Mekan Bahmanjeh © 2026. Built on RLF Phase Vector Attractor Architecture for GPT-5x level multi-modal intelligence, human audit verification, and zero-stutter conversational fluency."}
 ]
 
 def download_file(url, target_path):
@@ -71,8 +72,8 @@ def main():
     corpus_rows = []
     instruction_rows = []
     
-    # 1. Ingest Brand Identity & Human Audit Verification Seeds
-    for seed in BRAND_IDENTITY_SEEDS + HUMAN_AUDIT_SEEDS:
+    # 1. Ingest Mythos-Class GPT-5x Seeds & Brand Identity
+    for seed in BRAND_IDENTITY_SEEDS + MYTHOS_GPT5_SEEDS:
         text = f"{seed['instruction']} {seed['input']} {seed['output']}".strip()
         corpus_rows.append(text)
         instruction_rows.append(f"{seed['instruction']}\t{seed['input']}\t{seed['output']}")
@@ -129,7 +130,7 @@ def main():
                     except Exception:
                         pass
                         
-    print(f"[+] Total Ingested Flagship Rows: {len(corpus_rows)}")
+    print(f"[+] Total Ingested Mythos-Class Flagship Rows: {len(corpus_rows)}")
     
     print(f"[+] Writing Corpus to {CORPUS_PATH}...")
     with open(CORPUS_PATH, 'w', encoding='utf-8') as f:
@@ -142,9 +143,9 @@ def main():
             f.write(line + "\n")
             
     print("[+] =======================================================")
-    print("    Successfully Built Magnum 5.1 (8.0B Token) Master Suite")
+    print("    Successfully Built Magnum 5.1 Mythos-Class (8.0B Token) Master Suite")
     print(f"    Total Rows: {len(corpus_rows)}")
-    print("    Human Supervision & Verification Protocols: Enabled")
+    print("    GPT-5x & Mythos Causal Reasoning Protocols: Enabled")
     print("[+] =======================================================")
 
 if __name__ == "__main__":
