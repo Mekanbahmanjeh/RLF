@@ -20,64 +20,65 @@ Both 12.0 GB master checkpoints have been verified and downloaded to your local 
 
 ---
 
-## 💬 1. How to Run Interactive Multi-Turn Chat & Send Images
+## 💬 1. How to Chat Interactively with Existing Vast.ai Instance
 
-Instead of one-off single-prompt queries (`solstice ask`), you can launch an **interactive multi-turn conversation REPL session** with context history persistence and image/vision capabilities.
+To chat interactively in real time with your running Vast.ai instance from your local PowerShell / Terminal, run this single copy-paste SSH command:
 
-### 💻 A. Interactive Terminal REPL Chat (PowerShell / Linux Terminal)
+### 🚀 Copy-Paste SSH Command for Existing Instance (`38.49.42.46:55936`):
 
-#### On Windows PowerShell (Local Machine):
-```powershell
-# Navigate to directory containing compiled solstice binary
-solstice.exe chat `
-  --checkpoint "C:\Users\GC121\Downloads\vast_frontier_24g_8b_flagship.rlfsp" `
-  --profile frontier-24g `
-  --backend cuda `
-  --enforce-profile
+```bash
+ssh -t -p 55936 root@38.49.42.46 -o StrictHostKeyChecking=no "/workspace/RLF/build/3090-release/solstice chat --checkpoint /workspace/RLF/models/vast_frontier_24g_8b_flagship.rlfsp --profile frontier-24g --backend cuda --enforce-profile"
 ```
 
-#### On Linux / GPU Server (Vast.ai Instance):
-```bash
-/workspace/RLF/build/3090-release/solstice chat \
-  --checkpoint /workspace/RLF/models/vast_frontier_24g_8b_flagship.rlfsp \
-  --profile frontier-24g \
-  --backend cuda \
-  --enforce-profile
+> **Note**: The `-t` flag allocates a pseudo-terminal so that arrow keys, backspace, and multi-line responses work smoothly inside PowerShell!
+
+---
+
+### 🎮 Inside the Interactive Chat REPL:
+
+Once connected, you will see the interactive prompt:
+```text
+=========================================================================
+  Solstice Attractor Vector Interactive Chat REPL (Magnum 5.1 8.0B)
+=========================================================================
+User> Hello! Explain your capabilities in simple terms.
+Solstice> ...
+
+User> Solve d/dx [x^3 * e^(2x)] step-by-step.
+Solstice> ...
+
+User> /image /path/to/image.png
+[+] Image loaded and vision feature vectors extracted.
+User> Analyze this image and write a Next.js UI component to match it.
+Solstice> ...
+
+User> exit
 ```
 
 ---
 
-### 🖼️ B. Sending Images in Message (Multi-Modal Vision Input)
+## 🖼️ 2. Sending Images in Message (Multi-Modal Vision Input)
 
 Solstice natively ingests images into attractor context memory nodes. You can send images in two ways:
 
-#### Method 1: Command-Line Direct Vision Prompt
-```powershell
-solstice.exe ask `
-  --checkpoint "C:\Users\GC121\Downloads\vast_frontier_24g_8b_flagship.rlfsp" `
-  --image "C:\Users\GC121\Pictures\diagram.jpg" `
-  --prompt "Analyze this diagram and write a Next.js UI component to render it."
+#### Method A: Direct Command-Line Vision Prompt
+```bash
+ssh -p 55936 root@38.49.42.46 -o StrictHostKeyChecking=no "/workspace/RLF/build/3090-release/solstice ask --checkpoint /workspace/RLF/models/vast_frontier_24g_8b_flagship.rlfsp --image /workspace/RLF/demo_data/diagram.png --prompt 'Analyze this diagram and write a Next.js UI component.'"
 ```
 
-#### Method 2: Inside Interactive Chat Mode
-While inside `solstice chat`, type `/image` followed by the image path:
+#### Method B: Inside Interactive REPL Chat
+Type `/image` followed by the image path on the remote server:
 ```text
-Solstice Chat REPL
-User> /image C:\Users\GC121\Pictures\ui_mockup.png
-[+] Image loaded and vision feature vectors extracted successfully.
+User> /image /workspace/RLF/demo_data/ui_mockup.png
+[+] Image feature vectors extracted into attractor memory.
 User> Describe this interface and convert it into a Three.js 3D WebGL scene.
-Solstice> ...
 ```
 
 ---
 
-## 🌐 2. How to Deploy as a Serverless Endpoint on Vast.ai
+## 🌐 3. How to Deploy as a Serverless Endpoint on Vast.ai
 
-You can deploy Magnum 5.1 on Vast.ai as an OpenAI-compatible Serverless HTTP API server using FastAPI.
-
-### 🐍 Python Serverless API Launcher Script (`serve_magnum.py`)
-
-Create `serve_magnum.py` in your repository:
+Create `serve_magnum.py` on your Vast.ai instance to expose an OpenAI-compatible HTTP API server (`/v1/chat/completions`):
 
 ```python
 import os
@@ -138,47 +139,41 @@ if __name__ == "__main__":
   uvicorn.run(app, host="0.0.0.0", port=8000)
 ```
 
-### 🚀 Running Serverless on Vast.ai
+**Run Serverless API**:
 ```bash
 pip install fastapi uvicorn pydantic
 python3 serve_magnum.py
 ```
-Now any external application can send HTTP POST requests to `http://<YOUR-VAST-IP>:8000/v1/chat/completions`!
 
 ---
 
-## 🏗️ 3. How to Run on a Completely Empty Machine (From Scratch)
+## 🏗️ 4. How to Run on a Completely Empty Machine (From Scratch)
 
-Here is the complete step-by-step setup script for a brand new, empty Linux GPU machine:
+Run this **1-line automated setup script** on any new Linux GPU machine:
 
-### ⚡ 1-Line Full Automated Setup
 ```bash
 # Step 1: Install CUDA & C++ Build Toolchain
 sudo apt-get update && sudo apt-get install -y git cmake g++ build-essential nvidia-cuda-toolkit python3 python3-pip
 
-# Step 2: Clone Codebase
+# Step 2: Clone Codebase & Build Engine
 git clone https://github.com/Mekanbahmanjeh/RLF.git
 cd RLF
-
-# Step 3: Build Solstice Engine
 cmake -B build/release -S . -DCMAKE_BUILD_TYPE=Release -DRLF_ENABLE_CUDA=ON -DCMAKE_CUDA_ARCHITECTURES="80;86;89;90"
 cmake --build build/release --target solstice -j$(nproc)
 
-# Step 4: Download or Copy Checkpoint File into models/
+# Step 3: Copy Checkpoint & Launch Interactive Chat!
 mkdir -p models
-# Copy your vast_frontier_24g_8b_flagship.rlfsp file into models/ directory
-
-# Step 5: Start Interactive Chat!
+# Copy your vast_frontier_24g_8b_flagship.rlfsp file into models/
 ./build/release/solstice chat --checkpoint models/vast_frontier_24g_8b_flagship.rlfsp --profile frontier-24g --backend cuda
 ```
 
 ---
 
-## 🛠️ Summary Matrix
+## 🛠️ Quick Command Reference
 
-| Task | Command / Method |
+| Action | Exact Command |
 | :--- | :--- |
-| **Interactive REPL Chat** | `solstice chat --checkpoint <file.rlfsp> --profile frontier-24g --backend cuda` |
-| **Send Image File** | `solstice ask --checkpoint <file.rlfsp> --image <path.png> --prompt "..."` |
-| **Vast.ai Serverless API** | `python3 serve_magnum.py` (Exposes port `8000` REST API) |
-| **Empty Machine Build** | `cmake -B build -DRLF_ENABLE_CUDA=ON && cmake --build build --target solstice` |
+| **Existing Vast.ai Chat** | `ssh -t -p 55936 root@38.49.42.46 -o StrictHostKeyChecking=no "/workspace/RLF/build/3090-release/solstice chat --checkpoint /workspace/RLF/models/vast_frontier_24g_8b_flagship.rlfsp --profile frontier-24g --backend cuda --enforce-profile"` |
+| **Local Windows REPL Chat** | `solstice.exe chat --checkpoint "C:\Users\GC121\Downloads\vast_frontier_24g_8b_flagship.rlfsp" --profile frontier-24g --backend cuda` |
+| **Send Image / Vision Prompt** | `solstice ask --checkpoint <file.rlfsp> --image <path.png> --prompt "..."` |
+| **Serverless REST API** | `python3 serve_magnum.py` (Exposes port `8000` REST API) |
