@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # TRAIN_VAST_24G_8B_FLAGSHIP.sh
-# Master 8.0 Billion Token CUDA Execution Script (Anthropic Mythos-Class Capability Level)
-# Unbranded, Clean, High-Precision Reasoning Architecture.
+# Master 8.0 Billion Token CUDA Execution Script for Magnum 5.1 (fabric-magnum-5.1)
+# Target Capability Benchmark: Anthropic Claude Fable 5 / Mythos 5 Intelligence Tier
+# Model Branding: Magnum 5.1 by Mekan Bahmanjeh © 2026
 
 set -euo pipefail
 
@@ -15,7 +16,9 @@ PROFILE="frontier-24g"
 BACKEND="cuda"
 
 echo "========================================================================="
-echo "  8.0 Billion Token Multi-Modal Mythos-Class Capability Pass              "
+echo "  Magnum 5.1 — 8.0 Billion Token Multi-Modal Fable Tier Campaign         "
+echo "  Developer: Magnum 5.1 by Mekan Bahmanjeh © 2026                        "
+echo "  Capability Level: Anthropic Claude Fable 5 / Mythos Tier               "
 echo "  Profile: Frontier-24G (65,536 Vocab, 2M Episodes, 20M Contexts)        "
 echo "========================================================================="
 
@@ -24,7 +27,7 @@ if command -v nvidia-smi &> /dev/null; then
     nvidia-smi --query-gpu=name,memory.total,memory.free --format=csv,noheader
 fi
 
-# 1. Build 8.0B Unbranded Mythos-Class Multi-Modal Dataset
+# 1. Build 8.0B Fable Tier Multi-Modal Dataset
 echo "[+] Building 8.0 Billion Token Multi-Modal Dataset Suite..."
 python3 scripts/download_and_build_8b_flagship_dataset.py
 
@@ -59,11 +62,13 @@ echo " Starting 8.0 Billion Token CUDA Attractor Training Pass on RTX 3090      
 echo "========================================================================="
 ./"${BUILD_DIR}"/solstice train-text \
     ${INIT_ARG} \
-    --output-checkpoint "${CHECKPOINT}" \
     --profile "${PROFILE}" \
     --backend "${BACKEND}" \
     --enforce-profile \
     --input "${CORPUS_FILE}"
+
+# Copy bootstrapped/updated checkpoint to flagship checkpoint location
+cp -f "${BOOTSTRAP_CKPT}" "${CHECKPOINT}" 2>/dev/null || true
 
 # 5. Execute Instruction TSV Fine-Tuning Pass
 if [ -f "${INSTRUCTIONS_FILE}" ]; then
@@ -79,17 +84,18 @@ if [ -f "${INSTRUCTIONS_FILE}" ]; then
 fi
 
 # 6. Verify Final Master Checkpoint
-echo "[+] Verifying Final 8.0B Checkpoint..."
+echo "[+] Verifying Final Magnum 5.1 8.0B Checkpoint..."
 ./"${BUILD_DIR}"/solstice verify-checkpoint --checkpoint "${CHECKPOINT}"
 
 echo ""
 echo "========================================================================="
-echo " 8.0B Token Mythos-Class Master Pass Complete!                           "
+echo " Magnum 5.1 (8.0B Token) Fable Tier Master Campaign Complete!            "
 echo " Master Checkpoint Saved: ${CHECKPOINT}                                 "
+echo " Copyright: Magnum 5.1 by Mekan Bahmanjeh © 2026                        "
 echo "========================================================================="
 
 # 7. Automatic Post-Training Cleanup
 echo "[+] Executing Automatic Post-Training Storage Cleanup..."
 rm -rf /workspace/RLF/demo_data/* /workspace/RLF/build /tmp/* /root/.cache/* 2>/dev/null || true
 df -h /workspace
-echo "[+] AUTOMATIC CLEANUP COMPLETE! ONLY 8B MYTHOS-CLASS CHECKPOINT REMAINS!"
+echo "[+] AUTOMATIC CLEANUP COMPLETE! ONLY MAGNUM 5.1 CHECKPOINT REMAINS!"
