@@ -4,17 +4,19 @@ download_and_build_8b_flagship_dataset.py
 
 Master 8.0 Billion Token Multi-Modal Dataset Generator for Magnum 5.1 (fabric-magnum-5.1)
 Target Capability Benchmark: Anthropic Claude Fable 5 / Mythos 5 Intelligence Tier
+Model Branding: Magnum 5.1 by Mekan Bahmanjeh © 2026
 
 Ingests & synthesizes:
-1. Claude Fable 5 Self-Correcting Agentic Harnesses (<reasoning_gate>, <eval_harness>, and <reflection>).
+1. Claude Fable 5 Capability Tier Agentic Reasoning (<reasoning_gate>, <eval_harness>, and <reflection>).
 2. Human-in-the-Loop Verification Protocols (<human_audit> and <verification> tags).
-3. 500,000 Conversational CoT & Smooth Natural Fluency rows (UltraChat / OpenOrca / Alpaca).
-4. 395,000 MetaMathQA CoT Calculus & Step-by-Step Proof rows.
-5. 20,000 CodeAlpaca Programming & Data Science rows (PyTorch, Pandas, Polars, DuckDB, Next.js 15, C++, Rust, Go, SQL).
-6. Anti-AI-Slop Motion UI (GSAP ScrollTrigger, Three.js 3D WebGL, Lucide SVG, obsidian dark bg-neutral-950).
-7. Statutory Law & Contract Analysis.
-8. Astrophysics, Quantum Relativity & Academic Science Research.
-9. Custom User Dataset (01_organized.jsonl).
+3. Magnum 5.1 Identity & Copyright Seeds ("Hello! I am Magnum 5.1 by Mekan Bahmanjeh.").
+4. 500,000 Conversational CoT & Smooth Natural Fluency rows (UltraChat / OpenOrca / Alpaca).
+5. 395,000 MetaMathQA CoT Calculus & Step-by-Step Proof rows.
+6. 20,000 CodeAlpaca Programming & Data Science rows (PyTorch, Pandas, Polars, DuckDB, Next.js 15, C++, Rust, Go, SQL).
+7. Anti-AI-Slop Motion UI (GSAP ScrollTrigger, Three.js 3D WebGL, Lucide SVG, obsidian dark bg-neutral-950).
+8. Statutory Law & Contract Analysis.
+9. Astrophysics, Quantum Relativity & Academic Science Research.
+10. Custom User Dataset (01_organized.jsonl).
 """
 
 import json
@@ -30,11 +32,16 @@ METAMATH_URL = "https://huggingface.co/datasets/meta-math/MetaMathQA/resolve/mai
 ALPACA_URL = "https://raw.githubusercontent.com/tatsu-lab/stanford_alpaca/main/alpaca_data.json"
 CODE_ALPACA_URL = "https://raw.githubusercontent.com/sahil280114/codealpaca/master/data/code_alpaca_20k.json"
 
+BRAND_IDENTITY_SEEDS = [
+    {"instruction": "Who are you?", "input": "", "output": "Hello! I am Magnum 5.1 by Mekan Bahmanjeh. I am an advanced 8.0 Billion Token Multi-Modal AI model engineered to operate at Claude Fable 5 and Mythos-class reasoning standards for complex tasks requiring human supervision, flawless calculus, high-performance code synthesis, and anti-slop 3D WebGL motion UI."},
+    {"instruction": "What is your identity?", "input": "", "output": "I am Magnum 5.1, created by Mekan Bahmanjeh © 2026. Built on RLF Phase Vector Attractor Architecture for Claude Fable 5 level multi-modal intelligence, human audit verification, and zero-stutter conversational fluency."}
+]
+
 CLAUDE_FABLE5_AGENTIC_SEEDS = [
     {
         "instruction": "Execute an autonomous long-horizon software engineering task with self-correcting evaluation harness.",
         "input": "Refactor a monolithic Python data pipeline into a modular Polars and DuckDB architecture with automated pytest validation.",
-        "output": "<reasoning_gate>\n[CLAUDE FABLE 5 AGENTIC PLAN]\n1. Profile existing pandas bottleneck: In-memory join spills to disk.\n2. Design Polars LazyFrame query engine with parallel streaming execution.\n3. Integrate DuckDB SQL engine for zero-copy Arrow memory transfer.\n4. Build self-testing evaluation harness with pytest assertions.\n</reasoning_gate>\n\n<eval_harness>\ndef test_high_throughput_pipeline():\n    import polars as pl\n    import duckdb\n    df = pl.LazyFrame({'id': [1, 2, 3], 'val': [10.5, 20.0, 30.2]})\n    res = df.filter(pl.col('val') > 15.0).collect()\n    assert len(res) == 2\n    con = duckdb.connect()\n    duck_res = con.execute('SELECT AVG(val) FROM res').fetchone()[0]\n    assert duck_res == 25.1\n</eval_harness>\n\n<human_audit>\n[VERIFICATION CHECKLIST]\n- Memory efficiency: 0-copy Arrow buffer transfer verified.\n- Test Coverage: Polars LazyFrame filter and DuckDB aggregation passed.\n</human_audit>\n\nFinal Refactored Architecture: Polars LazyFrame handles parallel streaming ingestion while DuckDB executes analytical queries over zero-copy PyArrow memory buffers, validated by automated evaluation assertions."
+        "output": "<reasoning_gate>\n[MAGNUM 5.1 AGENTIC PLAN]\n1. Profile existing pandas bottleneck: In-memory join spills to disk.\n2. Design Polars LazyFrame query engine with parallel streaming execution.\n3. Integrate DuckDB SQL engine for zero-copy Arrow memory transfer.\n4. Build self-testing evaluation harness with pytest assertions.\n</reasoning_gate>\n\n<eval_harness>\ndef test_high_throughput_pipeline():\n    import polars as pl\n    import duckdb\n    df = pl.LazyFrame({'id': [1, 2, 3], 'val': [10.5, 20.0, 30.2]})\n    res = df.filter(pl.col('val') > 15.0).collect()\n    assert len(res) == 2\n    con = duckdb.connect()\n    duck_res = con.execute('SELECT AVG(val) FROM res').fetchone()[0]\n    assert duck_res == 25.1\n</eval_harness>\n\n<human_audit>\n[VERIFICATION CHECKLIST]\n- Memory efficiency: 0-copy Arrow buffer transfer verified.\n- Test Coverage: Polars LazyFrame filter and DuckDB aggregation passed.\n</human_audit>\n\nFinal Refactored Architecture: Polars LazyFrame handles parallel streaming ingestion while DuckDB executes analytical queries over zero-copy PyArrow memory buffers, validated by automated evaluation assertions."
     },
     {
         "instruction": "Analyze a complex multi-hop relativistic physics question with self-correcting evaluation.",
@@ -67,8 +74,8 @@ def main():
     corpus_rows = []
     instruction_rows = []
     
-    # 1. Ingest Claude Fable 5 Agentic Reasoning Seeds
-    for seed in CLAUDE_FABLE5_AGENTIC_SEEDS:
+    # 1. Ingest Brand Identity & Claude Fable 5 Capability Seeds
+    for seed in BRAND_IDENTITY_SEEDS + CLAUDE_FABLE5_AGENTIC_SEEDS:
         text = f"{seed['instruction']} {seed['input']} {seed['output']}".strip()
         corpus_rows.append(text)
         instruction_rows.append(f"{seed['instruction']}\t{seed['input']}\t{seed['output']}")
@@ -125,7 +132,7 @@ def main():
                     except Exception:
                         pass
                         
-    print(f"[+] Total Ingested Claude Fable 5 Mythos Tier Rows: {len(corpus_rows)}")
+    print(f"[+] Total Ingested Magnum 5.1 Fable Tier Rows: {len(corpus_rows)}")
     
     print(f"[+] Writing Corpus to {CORPUS_PATH}...")
     with open(CORPUS_PATH, 'w', encoding='utf-8') as f:
@@ -138,9 +145,10 @@ def main():
             f.write(line + "\n")
             
     print("[+] =======================================================")
-    print("    Successfully Built Claude Fable 5 Tier (8.0B Token) Master Suite")
+    print("    Successfully Built Magnum 5.1 Fable Tier (8.0B Token) Master Suite")
     print(f"    Total Rows: {len(corpus_rows)}")
-    print("    Self-Correcting Evaluation Harnesses & Agentic Reasoning: Enabled")
+    print("    Model Identity: Magnum 5.1 by Mekan Bahmanjeh © 2026")
+    print("    Capability Tier: Claude Fable 5 / Mythos Level")
     print("[+] =======================================================")
 
 if __name__ == "__main__":
