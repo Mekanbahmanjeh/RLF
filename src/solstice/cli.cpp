@@ -923,6 +923,18 @@ int run_train_dialogue(const Options& options) {
         throw std::invalid_argument("train-dialogue requires --manifest");
     }
     rlf::solstice::SolsticeModel model = load_or_create(options);
+
+    if (std::filesystem::exists(options.manifest)) {
+        std::ifstream file(options.manifest, std::ios::binary);
+        if (file.is_open()) {
+            std::string content(
+                (std::istreambuf_iterator<char>(file)),
+                std::istreambuf_iterator<char>()
+            );
+            model.train_text_corpus(content);
+        }
+    }
+
     const std::size_t row_count = for_each_tsv(
         options.manifest, 2U, 3U,
         [&model](const std::vector<std::string>& row) {
@@ -943,6 +955,18 @@ int run_train_instructions(const Options& options) {
         throw std::invalid_argument("train-instructions requires --manifest");
     }
     rlf::solstice::SolsticeModel model = load_or_create(options);
+
+    if (std::filesystem::exists(options.manifest)) {
+        std::ifstream file(options.manifest, std::ios::binary);
+        if (file.is_open()) {
+            std::string content(
+                (std::istreambuf_iterator<char>(file)),
+                std::istreambuf_iterator<char>()
+            );
+            model.train_text_corpus(content);
+        }
+    }
+
     const std::size_t row_count = for_each_tsv(
         options.manifest, 5U, 6U,
         [&model](const std::vector<std::string>& row) {
