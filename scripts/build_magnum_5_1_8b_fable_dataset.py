@@ -140,7 +140,7 @@ def main():
     # 3. Ingest CodeAlpaca Programming
     try:
         code_alpaca = fetch_json_cached(
-            "https://raw.githubusercontent.com/sahil280114/codealpaca/master/code_alpaca_20k.json",
+            "https://raw.githubusercontent.com/sahil280114/codealpaca/main/data/code_alpaca_20k.json",
             "code_alpaca_20k.json"
         )
         print("[+] Ingesting CodeAlpaca Programming rows...")
@@ -158,7 +158,7 @@ def main():
     # 4. Ingest MetaMathQA Math Reasoning
     try:
         metamath = fetch_json_cached(
-            "https://huggingface.co/datasets/meta-math/MetaMathQA/raw/main/MetaMathQA-395K.json",
+            "https://huggingface.co/datasets/meta-math/MetaMathQA/resolve/main/MetaMathQA-395K.json",
             "MetaMathQA-395K.json"
         )
         print("[+] Ingesting Sampled MetaMathQA Math Reasoning rows...")
