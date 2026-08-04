@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # TRAIN_ULTRA_FAST_FABLE_5.sh
-# Ultra-Fast GPU Attractor Training Script for Magnum 5.1 (Claude Fable 5 Tier)
-# Bypasses the 2-hour CPU bottleneck by using 100% GPU train-dialogue execution.
+# From-Scratch Pre-training & Attractor Anchoring Script for Magnum 5.1 (Claude Fable 5 Tier)
+# Model Identity: Magnum 5.1 by Mekan Bahmanjeh © 2026
 
 set -euo pipefail
 
@@ -14,7 +14,7 @@ PROFILE="frontier-24g"
 BACKEND="cuda"
 
 echo "========================================================================="
-echo "  Magnum 5.1 — Ultra-Fast Claude Fable 5 Tier GPU Training Campaign     "
+echo "  Magnum 5.1 — From-Scratch Claude Fable 5 Tier GPU Training Campaign   "
 echo "  Developer: Magnum 5.1 by Mekan Bahmanjeh © 2026                        "
 echo "  Capability Target: Claude Fable 5 & Mythos Level Intelligence         "
 echo "  Profile: Frontier-24G (20 Million Attractor Context Memory Nodes)       "
@@ -25,8 +25,8 @@ if command -v nvidia-smi &> /dev/null; then
     nvidia-smi --query-gpu=name,memory.total,memory.free --format=csv,noheader
 fi
 
-# 1. Build Multi-Domain Dialogue Dataset (102,000 Rows)
-echo "[+] Building Re-balanced Multi-Domain Dialogue Suite..."
+# 1. Build Multi-Domain Dialogue Dataset & Continuous Corpus
+echo "[+] Building Re-balanced Multi-Domain Dialogue Suite & Corpus..."
 python3 scripts/build_magnum_5_1_dialogue_dataset.py
 
 DIALOGUE_FILE="/workspace/RLF/demo_data/vast_8b_dialogue/dialogue.tsv"
@@ -43,16 +43,18 @@ cmake -B "${BUILD_DIR}" -S . \
 cmake --build "${BUILD_DIR}" --target solstice -j$(nproc)
 
 mkdir -p models
+rm -f "${CHECKPOINT}"
 
-# 3. Execute 100% GPU Attractor Matrix Training (Fast ~3-5 Minutes!)
+# 3. Execute 100% GPU Attractor Matrix Pre-Training & Dialogue Anchoring
 echo "========================================================================="
-echo " Starting 100% GPU Attractor Training Pass on RTX 3090 Tensor Cores     "
+echo " Starting From-Scratch GPU Attractor Training on RTX 3090 Tensor Cores  "
 echo "========================================================================="
 ./"${BUILD_DIR}"/solstice train-dialogue \
     --checkpoint "${CHECKPOINT}" \
     --profile "${PROFILE}" \
     --backend "${BACKEND}" \
     --enforce-profile \
+    --blank \
     --manifest "${DIALOGUE_FILE}"
 
 # 4. Verify Final Checkpoint
