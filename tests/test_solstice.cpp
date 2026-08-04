@@ -447,7 +447,7 @@ RLF_TEST_CASE("Solstice checkpoint roundtrip preserves behavior") {
     const rlf::solstice::SolsticeResponse response = restored.respond(
         "Who are you?", nullptr, nullptr
     );
-    RLF_CHECK(response.text.find("Solstice-General-Frontier") != std::string::npos);
+    RLF_CHECK(response.text.find("Magnum 5.1") != std::string::npos);
     std::filesystem::remove(path);
 }
 

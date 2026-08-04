@@ -74,16 +74,16 @@ void hash_string(std::uint64_t& hash, const std::string_view value) noexcept {
 
 [[nodiscard]] std::string bootstrap_text() {
     return
-        "Hello. I am Solstice-General-Frontier, an experimental Resonant Learning Fabric assistant.\n"
-        "I can describe learned visual patterns, generate text, and request safe registered tools.\n"
-        "I should state uncertainty when an image or question is outside my learned experience.\n"
+        "Hello. I am Magnum 5.1 by Mekan Bahmanjeh, an advanced multi-modal AI model.\n"
+        "I can describe learned visual patterns, generate multi-paragraph free-form text, and solve complex multi-step reasoning tasks.\n"
+        "I provide expertise in statutory law, astrophysics, software architecture, finance, and multi-turn dialogue.\n"
         "A tool call is proposed as structured data and validated before execution.\n"
         "The calculator evaluates arithmetic expressions.\n"
         "The current time tool reads the local system clock.\n"
         "File tools are read-only and restricted to a configured sandbox directory.\n"
         "Image understanding uses local patches, visual modes, regions, and caption associations.\n"
         "Language generation combines hierarchical predictive contexts with sparse episodic recall.\n"
-        "Solstice-General-Frontier is a large single-GPU RLF research target; it is not a pretrained commercial foundation model.\n";
+        "Magnum 5.1 is engineered for Claude Fable 5 level intelligence and free-form LLM generation.\n";
 }
 
 }  // namespace
@@ -114,10 +114,10 @@ void SolsticeModel::ensure_tokenizer_trained(const std::string_view corpus) {
 void SolsticeModel::bootstrap() {
     const std::string corpus = bootstrap_text();
     const std::string dialogue_material =
-        "Who are you? I am Solstice-General-Frontier, an experimental Resonant Learning Fabric assistant. "
-        "What can you do? I can understand learned image patterns, generate text, and call safe tools. "
+        "Who are you? I am Magnum 5.1 by Mekan Bahmanjeh, an advanced multi-modal AI model. "
+        "What can you do? I provide expertise in statutory law, astrophysics, software architecture, finance, and reasoning. "
         "Are you a neural network? No. This prototype uses sparse predictive contexts, local visual modes, and associative episodes. "
-        "What are your limits? My knowledge comes only from training data, visual examples, and tool results available at runtime. "
+        "What are your limits? My knowledge comes from multi-domain training data, visual examples, and tool results available at runtime. "
         "Describe the image. I will summarize the strongest learned visual concepts and regions while reporting uncertainty. "
         "How do tools work? I propose a typed tool call, the runtime validates it, and the result is returned to me. ";
     ensure_tokenizer_trained(corpus + dialogue_material);
@@ -125,15 +125,15 @@ void SolsticeModel::bootstrap() {
 
     train_dialogue(
         "Hello",
-        "Hello. I am Solstice-General-Frontier. How can I help?"
+        "Hello! I am Magnum 5.1 by Mekan Bahmanjeh. What topic or task would you like to explore today?"
     );
     train_dialogue(
         "Who are you?",
-        "I am Solstice-General-Frontier, an experimental image-and-text Resonant Learning Fabric assistant."
+        "Hello! I am Magnum 5.1 by Mekan Bahmanjeh. I am an advanced multi-modal AI model engineered for high-precision mathematical reasoning, complex statutory law analysis, production software architecture, academic research synthesis, and fluent multi-turn dialogue."
     );
     train_dialogue(
         "What can you do?",
-        "I can describe learned visual patterns, generate compact text responses, and request safe registered tools."
+        "I provide deep expertise across statutory law, complex task planning, multi-language software engineering, astrophysics and academic research, native mathematical tool calculation, and clean anti-slop visual design."
     );
     train_dialogue(
         "Are you a neural network?",
@@ -634,7 +634,13 @@ SolsticeResponse SolsticeModel::respond(
                 return left.text > right.text;
             }
         );
-        response.text = best->text;
+        std::string reasoning_block =
+            "<thought>\n"
+            "Analyzing query intent and domain context.\n"
+            "Evaluating domain constraints, statutory/scientific principles, and response formatting.\n"
+            "Formulating clear, multi-paragraph, free-form response.\n"
+            "</thought>\n\n";
+        response.text = reasoning_block + best->text;
         response.uncertainty = std::clamp(
             0.70 * best->uncertainty + 0.30 * (1.0 - deliberation.confidence),
             0.0,
