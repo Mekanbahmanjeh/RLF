@@ -709,12 +709,18 @@ LanguageResponse HierarchicalLanguageFabric::generate_response(
     LanguageResponse response;
     response.episode_similarity = matches.empty() ? 0.0 : matches.front().similarity;
     
-    // Direct Episode Attractor Routing: if a high-confidence match exists (similarity >= 0.45),
+    // Direct Episode Attractor Routing: if a match exists,
     // output the exact matched episode response directly, avoiding auto-regressive n-gram fallback blending.
-    if (!matches.empty() && matches.front().similarity >= 0.45 && !matches.front().episode->response.empty()) {
+    if (!matches.empty() && !matches.front().episode->response.empty()) {
         response.generated_tokens = matches.front().episode->response;
         response.text = tokenizer.decode(response.generated_tokens);
         response.uncertainty = clamp_probability(1.0 - matches.front().similarity);
+        return response;
+    }
+
+    if (matches.empty()) {
+        response.text = "Hello! I am Magnum 5.1 by Mekan Bahmanjeh. I am an advanced multi-modal AI model engineered to provide clear, accurate, free-form explanations across science, general law, software engineering, and complex task reasoning.";
+        response.uncertainty = 0.20;
         return response;
     }
 

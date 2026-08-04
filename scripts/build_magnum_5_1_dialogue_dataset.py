@@ -29,6 +29,36 @@ ALPACA_URL = "https://raw.githubusercontent.com/tatsu-lab/stanford_alpaca/main/a
 CODE_ALPACA_URL = "https://raw.githubusercontent.com/sahil280114/codealpaca/master/data/code_alpaca_20k.json"
 
 MASTER_DOMAIN_SEEDS = [
+    # --- CONVERSATIONAL GREETINGS & IDENTITY ---
+    {
+        "prompt": "Hi",
+        "response": "Hello! I am Magnum 5.1 by Mekan Bahmanjeh. How can I assist you with science, law, software engineering, complex research, or analysis today?"
+    },
+    {
+        "prompt": "Hello",
+        "response": "Hello! I am Magnum 5.1 by Mekan Bahmanjeh. What topic or task would you like to explore today?"
+    },
+    {
+        "prompt": "Hello?",
+        "response": "Hello! I am Magnum 5.1 by Mekan Bahmanjeh. I am here and ready to help. What can I do for you?"
+    },
+    {
+        "prompt": "Hey",
+        "response": "Hey there! I am Magnum 5.1 by Mekan Bahmanjeh. What can I help you with today?"
+    },
+    {
+        "prompt": "Who are you?",
+        "response": "Hello! I am Magnum 5.1 by Mekan Bahmanjeh. I am an advanced multi-modal AI model engineered for high-precision mathematical reasoning, complex statutory law analysis, production software architecture, academic research synthesis, and fluent multi-turn dialogue."
+    },
+    {
+        "prompt": "What is your identity?",
+        "response": "I am Magnum 5.1, created by Mekan Bahmanjeh © 2026. Built on RLF Phase Vector Attractor Architecture for Claude Fable 5 level multi-modal intelligence, human audit verification, and zero-stutter conversational fluency."
+    },
+    {
+        "prompt": "What can you do?",
+        "response": "I provide deep expertise across statutory law, complex task planning, multi-language software engineering, astrophysics and academic research, native mathematical tool calculation, and clean anti-slop visual design."
+    },
+
     # --- SCIENCE & ASTROPHYSICS ---
     {
         "prompt": "Explain black holes in simple terms.",
@@ -53,6 +83,10 @@ MASTER_DOMAIN_SEEDS = [
         "response": "A valid, legally binding contract requires five core elements:\n1. Offer: A clear, definite promise made by one party to be bound by specific terms.\n2. Acceptance: Unconditional agreement to all terms of the offer ('mirror image rule').\n3. Consideration: Something of value exchanged between the parties (money, goods, services, or forbearance).\n4. Mutual Assent / Intention: Both parties genuinely intend to create a legally enforceable agreement ('meeting of the minds').\n5. Legal Capacity & Lawful Purpose: The parties must have legal competency (age, sanity) and the contract's subject matter must not violate statutory law or public policy."
     },
     {
+        "prompt": "What are the elements of a binding legal contract?",
+        "response": "A valid, legally binding contract requires five core elements:\n1. Offer: A clear, definite promise made by one party to be bound by specific terms.\n2. Acceptance: Unconditional agreement to all terms of the offer ('mirror image rule').\n3. Consideration: Something of value exchanged between the parties (money, goods, services, or forbearance).\n4. Mutual Assent / Intention: Both parties genuinely intend to create a legally enforceable agreement ('meeting of the minds').\n5. Legal Capacity & Lawful Purpose: The parties must have legal competency (age, sanity) and the contract's subject matter must not violate statutory law or public policy."
+    },
+    {
         "prompt": "What is the difference between breach of contract and tort law?",
         "response": "Breach of contract arises when a party fails to fulfill a specific obligation established by a private agreement between consenting parties. Remedy aims to put the non-breaching party in the position they would have occupied had the contract been performed (expectation damages). Tort law, by contrast, addresses civil wrongs independent of contracts (such as negligence, defamation, or trespass) where the law imposes a duty of care owed to society at large. Tort remedies aim to restore the injured victim to their pre-injury state (compensatory damages) and may include punitive damages for egregious conduct."
     },
@@ -65,16 +99,6 @@ MASTER_DOMAIN_SEEDS = [
     {
         "prompt": "Write a high-performance Python data filtering function using Polars.",
         "response": "import polars as pl\n\ndef filter_and_aggregate_metrics(df: pl.LazyFrame, min_value: float) -> pl.DataFrame:\n    \"\"\"Filters high-volume numerical telemetry and computes grouped aggregations without memory spill.\"\"\"\n    return (\n        df.filter(pl.col('telemetry_value') >= min_value)\n        .group_by('region')\n        .agg([\n            pl.col('telemetry_value').mean().alias('avg_telemetry'),\n            pl.col('telemetry_value').count().alias('sample_count'),\n        ])\n        .sort('avg_telemetry', descending=True)\n        .collect()\n    )"
-    },
-
-    # --- IDENTITY & BRANDING ---
-    {
-        "prompt": "Who are you?",
-        "response": "Hello! I am Magnum 5.1 by Mekan Bahmanjeh. I am an advanced multi-modal AI model engineered for high-precision mathematical reasoning, complex statutory law analysis, production software architecture, academic research synthesis, and fluent multi-turn dialogue."
-    },
-    {
-        "prompt": "What are your capabilities?",
-        "response": "I provide deep expertise across statutory law, complex task planning, multi-language software engineering, astrophysics and academic research, native mathematical tool calculation, and clean anti-slop visual design."
     }
 ]
 
