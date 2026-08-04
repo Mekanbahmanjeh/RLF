@@ -68,7 +68,7 @@ echo "========================================================================="
     --backend "${BACKEND}" \
     --enforce-profile \
     --blank \
-    --corpus "${CORPUS_FILE}"
+    --input "${CORPUS_FILE}"
 
 echo "[+] Phase 1 Complete! Checkpoint after train-text:"
 ls -lh "${CHECKPOINT}"
