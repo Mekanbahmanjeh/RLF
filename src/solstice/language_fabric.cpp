@@ -700,9 +700,19 @@ LanguageResponse HierarchicalLanguageFabric::generate_response(
         !std::isfinite(settings.temperature) || settings.temperature <= 0.0) {
         throw std::invalid_argument("invalid Solstice generation settings");
     }
-    std::vector<TokenId> history = dialogue_prefix(tokenizer, prompt, grounding);
+    std::string_view effective_prompt = prompt;
+    const std::size_t user_pos = prompt.rfind("User: ");
+    if (user_pos != std::string_view::npos) {
+        effective_prompt = prompt.substr(user_pos + 6U);
+        const std::size_t asst_pos = effective_prompt.find("\nAssistant:");
+        if (asst_pos != std::string_view::npos) {
+            effective_prompt = effective_prompt.substr(0U, asst_pos);
+        }
+    }
+
+    std::vector<TokenId> history = dialogue_prefix(tokenizer, effective_prompt, grounding);
     std::vector<TokenId> cue = tokenizer.encode(grounding);
-    const std::vector<TokenId> prompt_tokens = tokenizer.encode(prompt);
+    const std::vector<TokenId> prompt_tokens = tokenizer.encode(effective_prompt);
     cue.insert(cue.end(), prompt_tokens.begin(), prompt_tokens.end());
     const std::vector<EpisodeMatch> matches = match_episodes(cue, 8U);
 
